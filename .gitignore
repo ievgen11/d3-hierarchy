@@ -1,0 +1,16 @@
+/node_modules
+
+# config
+/src/config/config_dev.js
+/src/config/config_prod.js
+
+# idea
+.idea
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+/yarn-error.log

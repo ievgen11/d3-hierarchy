@@ -1,0 +1,37 @@
+{
+    "name": "d3-project",
+    "version": "0.0.1",
+    "description": "App",
+    "author": "ievgen11",
+    "dependencies": {
+        "@rmwc/provider": "^5.2.1",
+        "@rmwc/theme": "^5.2.1",
+        "axios": "^0.17.1",
+        "d3": "^5.9.2",
+        "firebase": "^5.9.2",
+        "immutable": "^3.8.2",
+        "normalize.css": "^8.0.1",
+        "react": "^16.1.1",
+        "react-dom": "^16.1.1",
+        "react-redux": "^5.0.5",
+        "react-router-dom": "^4.3.1",
+        "react-router-redux": "^4.0.7",
+        "react-scripts": "^2.0.0",
+        "redux": "^4.0.0",
+        "redux-promise-middleware": "^5.1.1",
+        "redux-thunk": "^2.1.0",
+        "styled-components": "^4.1.1"
+    },
+    "scripts": {
+        "build": "NODE_ENV=production react-scripts build",
+        "watch": "NODE_ENV=development PORT=8080 react-scripts start",
+        "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run build"
+    },
+    "proxy": "http://localhost:3000",
+    "browserslist": [
+        ">0.2%",
+        "not dead",
+        "not ie <= 11",
+        "not op_mini all"
+    ]
+}
