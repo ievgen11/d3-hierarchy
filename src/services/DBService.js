@@ -14,7 +14,7 @@ class DBService {
     getData() {
         return new Promise(resolve =>
             this.db
-                .collection('children')
+                .collection('geo-hierarchy')
                 .get()
                 .then(res => resolve(res.docs.map(doc => doc.data())))
         );

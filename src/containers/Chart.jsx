@@ -5,9 +5,11 @@ import { connect } from 'react-redux';
 import actions from '../redux/actions';
 import selectors from '../redux/selectors';
 
+import GeoHierarchy from '../components/GeoHierarchy';
+
 class Chart extends Component {
     static propTypes = {
-        data: PropTypes.array,
+        data: PropTypes.object,
         isError: PropTypes.bool.isRequired,
         isPending: PropTypes.bool.isRequired,
         getDataAction: PropTypes.func.isRequired
@@ -22,17 +24,7 @@ class Chart extends Component {
     render() {
         const { data, isPending, isError } = this.props;
 
-        if (isPending) {
-            return (<b>Loading...</b>);
-        }
-
-        if (isError) {
-            return (<b>Error!</b>);
-        }
-
-        console.log(data);
-
-        return <b>{JSON.stringify(data)}</b>;
+        return <GeoHierarchy data={data} isPending={isPending} isError={isError} />;
     }
 }
 

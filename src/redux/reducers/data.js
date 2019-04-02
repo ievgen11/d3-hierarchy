@@ -2,7 +2,7 @@ import * as actionTypes from "../actionTypes";
 import { Record } from "immutable";
 
 const Model = Record({
-    data: [],
+    data: {},
     isPending: false,
     isError: false
 });
@@ -15,19 +15,19 @@ const UserReducer = (state = initialState, action) => {
             return state.withMutations(mutant => {
                 mutant.set("isPending", false);
                 mutant.set("isError", false);
-                mutant.set("data", action.payload);
+                mutant.set("data", action.payload[0]);
             });
         case actionTypes.GET_DATA.PENDING:
             return state.withMutations(mutant => {
                 mutant.set("isPending", true);
                 mutant.set("isError", false);
-                mutant.set("data", []);
+                mutant.set("data", {});
             });
         case actionTypes.GET_DATA.REJECTED:
             return state.withMutations(mutant => {
                 mutant.set("isError", true);
                 mutant.set("isPending", false);
-                mutant.set("data", []);
+                mutant.set("data", {});
             });
         default:
             return state;
