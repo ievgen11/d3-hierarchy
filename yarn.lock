@@ -2735,6 +2735,13 @@ cssstyle@^1.0.0:
   dependencies:
     cssom "0.3.x"
 
+cx@^19.3.2:
+  version "19.3.2"
+  resolved "https://registry.yarnpkg.com/cx/-/cx-19.3.2.tgz#1e7a3cb8fadb383071a088ce3e8d372f26711775"
+  dependencies:
+    intl-io "^0.2.11"
+    route-parser "^0.0.5"
+
 cyclist@~0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/cyclist/-/cyclist-0.2.2.tgz#1b33792e11e914a2fd6d6ed6447464444e5fa640"
@@ -4500,6 +4507,10 @@ internal-ip@^3.0.1:
   dependencies:
     default-gateway "^2.6.0"
     ipaddr.js "^1.5.2"
+
+intl-io@^0.2.11:
+  version "0.2.12"
+  resolved "https://registry.yarnpkg.com/intl-io/-/intl-io-0.2.12.tgz#1579b75ace3c96759c6e266903d61579eb56bdb7"
 
 invariant@^2.2.2, invariant@^2.2.4:
   version "2.2.4"
@@ -7805,6 +7816,10 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
   dependencies:
     hash-base "^3.0.0"
     inherits "^2.0.1"
+
+route-parser@^0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/route-parser/-/route-parser-0.0.5.tgz#7d1d09d335e49094031ea16991a4a79b01bbe1f4"
 
 rsvp@^3.3.3:
   version "3.6.2"

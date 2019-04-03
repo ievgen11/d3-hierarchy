@@ -1,52 +1,33 @@
 .container {
-    margin: 10px;
+    margin: 10px auto;
     border: 1px solid #c3c3c3;
     position: relative;
     border-radius: 10px;
 }
 
-svg {
-    -moz-user-select: none; /* Firefox */
-    -ms-user-select: none; /* Internet Explorer */
-    -khtml-user-select: none; /* KHTML browsers (e.g. Konqueror) */
-    -webkit-user-select: none; /* Chrome, Safari, and Opera */
-    -webkit-touch-callout: none; /* Disable Android and iOS callouts*/
-    width: 100%;
-    height: 100%;
+.isPending {
+    position: relative;
+}
+
+.isPending::after {
+    height: 0;
+    width: 0;
+    padding: 15px;
+    border: 6px solid #c3c3c3;
+    border-right-color: #3B90E3;
+    border-radius: 22px;
+    -webkit-animation: rotate 1s infinite linear;
+    /* left, top and position just for the demo! */
     position: absolute;
-    top: 0;
-    left: 0;
+    left: 50%;
+    top: 50%;
+    content: '';
 }
 
-.zoom {
-    cursor: move; /* fallback if grab cursor is unsupported */
-    cursor: grab;
-    cursor: -moz-grab;
-    cursor: -webkit-grab;
-}
-
- /* (Optional) Apply a "closed-hand" cursor during drag operation. */
-.zoom:active {
-    cursor: grabbing;
-    cursor: -moz-grabbing;
-    cursor: -webkit-grabbing;
-}
-
-.node {
-    cursor: pointer;
-}
-
-.node:hover {
-    text-decoration: underline;
-    text-underline-position: under;
-}
-
-.node text {
-    font: 14px sans-serif;
-}
-
-.link {
-    fill: none;
-    stroke: #c3c3c3;
-    stroke-width: 1px;
-}
+@-webkit-keyframes rotate {
+    /* 100% keyframe for  clockwise. 
+       use 0% instead for anticlockwise */
+    100% {
+      -webkit-transform: rotate(360deg);
+    }
+  }

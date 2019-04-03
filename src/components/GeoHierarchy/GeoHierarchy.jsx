@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { select } from 'd3-selection';
+import cx from 'classnames';
 
-import _d3 from './_d3';
+import _d3 from './d3';
 
 import './styles.css';
 
@@ -20,29 +21,25 @@ class GeoHierarchy extends Component {
 
     componentDidMount() {
         const { width, height } = this.props;
-        this._d3 = new _d3(
-            this._root,
-            width,
-            height
-        );
+        this._d3 = new _d3(this._root, width, height);
     }
 
     componentDidUpdate() {
         const { data } = this.props;
 
-        if (Object.keys(data).length <= 0) {
-            return;
-        }
-
-        this._d3.updateData(data);
+        this._d3.updateData(data.toJS());
     }
 
     render() {
+        const { isPending } = this.props;
+
         return (
-            <div className="container" style={{
-                width: this.props.width,
-                height: this.props.height
-            }}
+            <div
+                className={cx('container', { isPending: isPending })}
+                style={{
+                    width: this.props.width,
+                    height: this.props.height
+                }}
                 ref={node => {
                     this._root = select(node);
                 }}

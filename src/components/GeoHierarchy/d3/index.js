@@ -27,23 +27,23 @@ class _d3 {
         this.numberOfItems = 0;
         this.width = width;
         this.height = height;
-        this.treeMap = tree().nodeSize([50, 50]);
-        this.root = null;
+        this.treeMap = tree().nodeSize([60, 60]);
+        this.data = null;
 
         this._init(root);
     }
 
     updateData(data) {
-        this.root = hierarchy(data, d => d.children);
+        this.data = hierarchy(data, d => d.children);
 
-        this.root.x0 = this.height / 2;
-        this.root.y0 = this.height / 2;
+        this.data.x0 = 0;
+        this.data.y0 = 0;
 
-        if (this.root.children) {
-            this.root.children.forEach(collapse);
+        if (this.data.children) {
+            this.data.children.forEach(collapse);
         }
 
-        this._updateD3(this.root);
+        this._updateD3(this.data);
     }
 
     _click(d) {
@@ -66,7 +66,7 @@ class _d3 {
     }
 
     _updateD3(source) {
-        var treeData = this.treeMap(this.root);
+        var treeData = this.treeMap(this.data);
 
         var nodes = treeData.descendants(),
             links = treeData.descendants().slice(1);
@@ -84,6 +84,11 @@ class _d3 {
             if (d.data.type === 'Port') {
                 return '#ffbb1d';
             }
+
+            if (!d.parent) {
+                return '#f57c00';
+            }
+
             return d.children ? '#3B90E3' : '#2F385E';
         });
 
@@ -107,6 +112,11 @@ class _d3 {
                 if (d.data.type === 'Port') {
                     return '#ffbb1d';
                 }
+
+                if (!d.parent) {
+                    return '#f57c00';
+                }
+
                 return d.children ? '#3B90E3' : '#2F385E';
             });
 

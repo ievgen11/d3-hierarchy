@@ -7,6 +7,7 @@
         "@rmwc/provider": "^5.2.1",
         "@rmwc/theme": "^5.2.1",
         "axios": "^0.17.1",
+        "classnames": "^2.2.6",
         "d3-hierarchy": "^1.1.8",
         "d3-selection": "^1.4.0",
         "d3-transition": "^1.2.0",
