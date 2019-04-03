@@ -1,12 +1,11 @@
 import { tree, hierarchy } from 'd3-hierarchy';
+import { zoom, zoomIdentity } from 'd3-zoom';
+import { event } from 'd3-selection';
 import 'd3-transition';
 
-var i = 0,
-    duration = 750;
+import { TRANSITION_DURATION } from './constants';
 
-var margin = { top: 20, right: 90, bottom: 30, left: 90 },
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+import './styles.css';
 
 function collapse(d) {
     if (d.children) {
@@ -25,10 +24,10 @@ function diagonal(s, d) {
 
 class _d3 {
     constructor(root, width, height) {
-        this.i = 0;
+        this.numberOfItems = 0;
         this.width = width;
         this.height = height;
-        this.treeMap = tree().size([height, width]);
+        this.treeMap = tree().nodeSize([50, 50]);
         this.root = null;
 
         this._init(root);
@@ -37,8 +36,8 @@ class _d3 {
     updateData(data) {
         this.root = hierarchy(data, d => d.children);
 
-        this.root.x0 = height / 2;
-        this.root.y0 = 0;
+        this.root.x0 = this.height / 2;
+        this.root.y0 = this.height / 2;
 
         if (this.root.children) {
             this.root.children.forEach(collapse);
@@ -48,6 +47,13 @@ class _d3 {
     }
 
     _click(d) {
+        if (d.data.type === 'Port') {
+            window
+                .open(`http://locode.info/${d.data.location}`, '_blank')
+                .focus();
+            return;
+        }
+
         if (d.children) {
             d._children = d.children;
             d.children = null;
@@ -55,7 +61,7 @@ class _d3 {
             d.children = d._children;
             d._children = null;
         }
-        console.log('click!')
+
         this._updateD3(d);
     }
 
@@ -66,78 +72,72 @@ class _d3 {
             links = treeData.descendants().slice(1);
 
         nodes.forEach(function(d) {
-            d.y = d.depth * 180;
+            d.y = d.depth * 200;
         });
 
         var node = this.svg
+            .select('.content')
             .selectAll('g.node')
-            .data(nodes, d => d.id || (d.id = ++this.i));
+            .data(nodes, d => d.id || (d.id = ++this.numberOfItems));
+
+        node.selectAll('circle').attr('fill', d => {
+            if (d.data.type === 'Port') {
+                return '#ffbb1d';
+            }
+            return d.children ? '#3B90E3' : '#2F385E';
+        });
 
         var nodeEnter = node
             .enter()
             .append('g')
             .attr('class', 'node')
-            .attr('transform', d => `translate(${source.y0},${source.x0})`)
+            .attr('transform', () => `translate(${source.y0},${source.x0})`)
             .on('click', this._click.bind(this));
 
         nodeEnter
-            .attr('class', 'node')
-            .attr('r', 1e-6)
-            .style('fill', d => (d.parent ? 'rgb(39, 43, 77)' : '#fe6e9e'));
-
-        nodeEnter
-            .append('rect')
-            .attr('rx', d => {
-                if (d.parent) return d.children || d._children ? 0 : 6;
-                return 10;
-            })
-            .attr('ry', d => {
-                if (d.parent) return d.children || d._children ? 0 : 6;
-                return 10;
-            })
-            .attr('stroke-width', d => (d.parent ? 1 : 0))
-            .attr('stroke', d =>
-                d.children || d._children
-                    ? 'rgb(3, 192, 220)'
-                    : 'rgb(38, 222, 176)'
-            )
-            .attr('stroke-dasharray', d =>
-                d.children || d._children ? '0' : '2.2'
-            )
-            .attr('stroke-opacity', d =>
-                d.children || d._children ? '1' : '0.6'
-            )
-            .attr('x', 0)
-            .attr('y', -10)
-            .attr('width', d => (d.parent ? 40 : 20))
-            .attr('height', 20);
+            .append('circle')
+            .style('opacity', 0)
+            .transition()
+            .duration(TRANSITION_DURATION)
+            .style('opacity', 1)
+            .attr('r', 5)
+            .attr('cx', 0)
+            .attr('cy', 0)
+            .attr('fill', d => {
+                if (d.data.type === 'Port') {
+                    return '#ffbb1d';
+                }
+                return d.children ? '#3B90E3' : '#2F385E';
+            });
 
         nodeEnter
             .append('text')
-            .style('fill', d => {
-                if (d.parent) {
-                    return d.children || d._children
-                        ? '#ffffff'
-                        : 'rgb(38, 222, 176)';
+            .style('opacity', 0)
+            .transition()
+            .duration(TRANSITION_DURATION)
+            .style('opacity', 1)
+            .attr('dy', -15)
+            .attr('x', 0)
+            .style('fill', '#10183a')
+            .attr('text-anchor', () => 'middle')
+            .text(d => {
+                if (d.data.type === 'Port') {
+                    return `${d.data.name} (${d.data.location})`;
                 }
-                return 'rgb(39, 43, 77)';
-            })
-            .attr('dy', '.35em')
-            .attr('x', d => (d.parent ? 20 : 10))
-            .attr('text-anchor', d => 'middle')
-            .text(d => d.data.name);
+                return d.data.name;
+            });
 
         var nodeUpdate = nodeEnter.merge(node);
 
         nodeUpdate
             .transition()
-            .duration(duration)
+            .duration(TRANSITION_DURATION)
             .attr('transform', d => `translate(${d.y},${d.x})`);
 
         var nodeExit = node
             .exit()
             .transition()
-            .duration(duration)
+            .duration(TRANSITION_DURATION)
             .attr('transform', () => `translate(${source.y},${source.x})`)
             .remove();
 
@@ -145,7 +145,10 @@ class _d3 {
         nodeExit.select('rect').attr('stroke-opacity', 1e-6);
         nodeExit.select('text').style('fill-opacity', 1e-6);
 
-        var link = this.svg.selectAll('path.link').data(links, d => d.id);
+        var link = this.svg
+            .select('.content')
+            .selectAll('path.link')
+            .data(links, d => d.id);
 
         var linkEnter = link
             .enter()
@@ -162,14 +165,19 @@ class _d3 {
 
         linkUpdate
             .transition()
-            .duration(duration)
+            .duration(TRANSITION_DURATION)
             .attr('d', d => diagonal(d, d.parent));
 
         var linkExit = link
             .exit()
             .transition()
-            .duration(duration)
-            .attr('d', () => diagonal({ x: source.x, y: source.y }, { x: source.x, y: source.y }))
+            .duration(TRANSITION_DURATION)
+            .attr('d', () =>
+                diagonal(
+                    { x: source.x, y: source.y },
+                    { x: source.x, y: source.y }
+                )
+            )
             .remove();
 
         nodes.forEach(function(d) {
@@ -178,16 +186,51 @@ class _d3 {
         });
     }
 
-    _init(root) {
-        this.svg = root
-            .append('svg')
-            .attr('width', width + margin.right + margin.left)
-            .attr('height', height + margin.top + margin.bottom)
+    _handleZoom() {
+        return zoom()
+            .scaleExtent([1 / 2, 4])
+            .on('zoom', () => {
+                this.svg.select('.content').attr('transform', event.transform);
+            });
+    }
+
+    _initZoom(element) {
+        element
+            .append('rect')
+            .attr('class', 'zoom')
+            .attr('width', this.width)
+            .attr('height', this.height)
+            .style('fill', 'none')
+            .style('pointer-events', 'all')
+            .call(
+                zoom()
+                    .scaleExtent([1 / 2, 4])
+                    .on('zoom', () => {
+                        element
+                            .select('.content')
+                            .attr('transform', event.transform);
+                    })
+            )
+            .call(
+                zoom().transform,
+                zoomIdentity.translate(this.width / 4, this.height / 2).scale(1)
+            );
+
+        element
             .append('g')
+            .attr('class', 'content')
             .attr(
                 'transform',
-                'translate(' + margin.left + ',' + margin.top + ')'
+                zoomIdentity.translate(this.width / 4, this.height / 2).scale(1)
             );
+
+        return element;
+    }
+
+    _init(root) {
+        var svg = root.append('svg');
+
+        this.svg = this._initZoom(svg);
     }
 }
 

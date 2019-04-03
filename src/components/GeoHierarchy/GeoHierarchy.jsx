@@ -4,6 +4,8 @@ import { select } from 'd3-selection';
 
 import _d3 from './_d3';
 
+import './styles.css';
+
 class GeoHierarchy extends Component {
     static propTypes = {
         data: PropTypes.object,
@@ -12,7 +14,7 @@ class GeoHierarchy extends Component {
     };
 
     static defaultProps = {
-        width: 1000,
+        width: 1280,
         height: 500
     };
 
@@ -28,12 +30,19 @@ class GeoHierarchy extends Component {
     componentDidUpdate() {
         const { data } = this.props;
 
+        if (Object.keys(data).length <= 0) {
+            return;
+        }
+
         this._d3.updateData(data);
     }
 
     render() {
         return (
-            <div
+            <div className="container" style={{
+                width: this.props.width,
+                height: this.props.height
+            }}
                 ref={node => {
                     this._root = select(node);
                 }}

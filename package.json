@@ -10,6 +10,7 @@
         "d3-hierarchy": "^1.1.8",
         "d3-selection": "^1.4.0",
         "d3-transition": "^1.2.0",
+        "d3-zoom": "^1.7.3",
         "firebase": "^5.9.2",
         "immutable": "^3.8.2",
         "normalize.css": "^8.0.1",
