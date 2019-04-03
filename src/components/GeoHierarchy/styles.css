@@ -1,12 +1,25 @@
 .container {
     margin: 10px auto;
-    border: 1px solid #c3c3c3;
+    border: 1px solid #ebebeb;
     position: relative;
-    border-radius: 10px;
+    border-radius: 5px;
+    -webkit-box-shadow: inset 0px 0px 107px -79px rgba(0,0,0,0.75);
+    -moz-box-shadow: inset 0px 0px 107px -79px rgba(0,0,0,0.75);
+    box-shadow: inset 0px 0px 107px -79px rgba(0,0,0,0.75);
 }
 
 .isPending {
     position: relative;
+}
+
+.isPending::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    content: '';
+    z-index: 1;
 }
 
 .isPending::after {
@@ -14,7 +27,7 @@
     width: 0;
     padding: 15px;
     border: 6px solid #c3c3c3;
-    border-right-color: #3B90E3;
+    border-right-color: #3b90e3;
     border-radius: 22px;
     -webkit-animation: rotate 1s infinite linear;
     /* left, top and position just for the demo! */
@@ -22,12 +35,13 @@
     left: 50%;
     top: 50%;
     content: '';
+    z-index: 2;
 }
 
 @-webkit-keyframes rotate {
     /* 100% keyframe for  clockwise. 
        use 0% instead for anticlockwise */
     100% {
-      -webkit-transform: rotate(360deg);
+        -webkit-transform: rotate(360deg);
     }
-  }
+}

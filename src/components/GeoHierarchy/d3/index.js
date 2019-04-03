@@ -7,14 +7,6 @@ import { TRANSITION_DURATION } from './constants';
 
 import './styles.css';
 
-function collapse(d) {
-    if (d.children) {
-        d._children = d.children;
-        d._children.forEach(collapse);
-        d.children = null;
-    }
-}
-
 function diagonal(s, d) {
     return `M ${s.y} ${s.x}
     C ${(s.y + d.y) / 2} ${s.x},
@@ -24,10 +16,9 @@ function diagonal(s, d) {
 
 class _d3 {
     constructor(root, width, height) {
-        this.numberOfItems = 0;
         this.width = width;
         this.height = height;
-        this.treeMap = tree().nodeSize([60, 60]);
+        this.tree = tree().nodeSize([60, 60]);
         this.data = null;
 
         this._init(root);
@@ -40,13 +31,21 @@ class _d3 {
         this.data.y0 = 0;
 
         if (this.data.children) {
-            this.data.children.forEach(collapse);
+            this.data.children.forEach(child => this._collapseNodes(child));
         }
 
         this._updateD3(this.data);
     }
 
-    _click(d) {
+    _collapseNodes(d) {
+        if (d.children) {
+            d._children = d.children;
+            d._children.forEach(child => this._collapseNodes(child));
+            d.children = null;
+        }
+    }
+
+    _handleClick(d) {
         if (d.data.type === 'Port') {
             window
                 .open(`http://locode.info/${d.data.location}`, '_blank')
@@ -65,46 +64,8 @@ class _d3 {
         this._updateD3(d);
     }
 
-    _updateD3(source) {
-        var treeData = this.treeMap(this.data);
-
-        var nodes = treeData.descendants(),
-            links = treeData.descendants().slice(1);
-
-        nodes.forEach(function(d) {
-            d.y = d.depth * 200;
-        });
-
-        var node = this.svg
-            .select('.content')
-            .selectAll('g.node')
-            .data(nodes, d => d.id || (d.id = ++this.numberOfItems));
-
-        node.selectAll('circle').attr('fill', d => {
-            if (d.data.type === 'Port') {
-                return '#ffbb1d';
-            }
-
-            if (!d.parent) {
-                return '#f57c00';
-            }
-
-            return d.children ? '#3B90E3' : '#2F385E';
-        });
-
-        var nodeEnter = node
-            .enter()
-            .append('g')
-            .attr('class', 'node')
-            .attr('transform', () => `translate(${source.y0},${source.x0})`)
-            .on('click', this._click.bind(this));
-
-        nodeEnter
-            .append('circle')
-            .style('opacity', 0)
-            .transition()
-            .duration(TRANSITION_DURATION)
-            .style('opacity', 1)
+    _formatCircle(node) {
+        return node
             .attr('r', 5)
             .attr('cx', 0)
             .attr('cy', 0)
@@ -119,13 +80,17 @@ class _d3 {
 
                 return d.children ? '#3B90E3' : '#2F385E';
             });
+    }
 
-        nodeEnter
-            .append('text')
-            .style('opacity', 0)
-            .transition()
-            .duration(TRANSITION_DURATION)
-            .style('opacity', 1)
+    _formatLabel(node) {
+        return node
+            .attr('font-weight', d => {
+                if (d.data.type === 'Port') {
+                    return 600;
+                }
+
+                return 300;
+            })
             .attr('dy', -15)
             .attr('x', 0)
             .style('fill', '#10183a')
@@ -136,6 +101,42 @@ class _d3 {
                 }
                 return d.data.name;
             });
+    }
+
+    _generateNodes(target, data) {
+        var node = this.svg
+            .select('.content')
+            .selectAll('g.node')
+            .data(data, d => d.data.location);
+
+        // Update existing stuff
+        this._formatCircle(node.selectAll('circle'));
+        this._formatLabel(node.selectAll('text'));
+
+        var nodeEnter = node
+            .enter()
+            .append('g')
+            .attr('class', 'node')
+            .attr('transform', () => `translate(${target.y0},${target.x0})`)
+            .on('click', d => this._handleClick(d));
+
+        this._formatCircle(
+            nodeEnter
+                .append('circle')
+                .style('opacity', 0)
+                .transition()
+                .duration(TRANSITION_DURATION)
+                .style('opacity', 1)
+        );
+
+        this._formatLabel(
+            nodeEnter
+                .append('text')
+                .style('opacity', 0)
+                .transition()
+                .duration(TRANSITION_DURATION)
+                .style('opacity', 1)
+        );
 
         var nodeUpdate = nodeEnter.merge(node);
 
@@ -148,17 +149,19 @@ class _d3 {
             .exit()
             .transition()
             .duration(TRANSITION_DURATION)
-            .attr('transform', () => `translate(${source.y},${source.x})`)
+            .attr('transform', () => `translate(${target.y},${target.x})`)
             .remove();
 
         nodeExit.select('rect').style('opacity', 1e-6);
         nodeExit.select('rect').attr('stroke-opacity', 1e-6);
         nodeExit.select('text').style('fill-opacity', 1e-6);
+    }
 
+    _generateLinks(target, data) {
         var link = this.svg
             .select('.content')
             .selectAll('path.link')
-            .data(links, d => d.id);
+            .data(data, d => d.data.location);
 
         var linkEnter = link
             .enter()
@@ -166,8 +169,8 @@ class _d3 {
             .attr('class', 'link')
             .attr('d', () =>
                 diagonal(
-                    { x: source.x0, y: source.y0 },
-                    { x: source.x0, y: source.y0 }
+                    { x: target.x0, y: target.y0 },
+                    { x: target.x0, y: target.y0 }
                 )
             );
 
@@ -176,7 +179,7 @@ class _d3 {
         linkUpdate
             .transition()
             .duration(TRANSITION_DURATION)
-            .attr('d', d => diagonal(d, d.parent));
+            .attr('d', d => (d && d.parent ? diagonal(d, d.parent) : null));
 
         var linkExit = link
             .exit()
@@ -184,63 +187,64 @@ class _d3 {
             .duration(TRANSITION_DURATION)
             .attr('d', () =>
                 diagonal(
-                    { x: source.x, y: source.y },
-                    { x: source.x, y: source.y }
+                    { x: target.x, y: target.y },
+                    { x: target.x, y: target.y }
                 )
             )
             .remove();
-
-        nodes.forEach(function(d) {
-            d.x0 = d.x;
-            d.y0 = d.y;
-        });
     }
 
-    _handleZoom() {
-        return zoom()
-            .scaleExtent([1 / 2, 4])
+    _updateD3(target) {
+        var data = this.tree(this.data)
+            .descendants()
+            .map(d => {
+                d.y = d.depth * 200;
+                d.x0 = d.x;
+                d.y0 = d.y;
+
+                return d;
+            });
+
+        this._generateNodes(target, data);
+        this._generateLinks(target, data);
+    }
+
+    _handleTranslate() {
+        return zoomIdentity.translate(this.width / 3, this.height / 2).scale(1);
+    }
+
+    _setZoom(element) {
+        this.zoom = zoom()
+            .scaleExtent([0.5, 2])
             .on('zoom', () => {
-                this.svg.select('.content').attr('transform', event.transform);
+                element.select('.content').attr('transform', event.transform);
             });
     }
 
-    _initZoom(element) {
-        element
-            .append('rect')
+    _initZoom() {
+        const svg = this.svg;
+        this._setZoom(svg);
+
+        svg.append('rect')
             .attr('class', 'zoom')
             .attr('width', this.width)
             .attr('height', this.height)
             .style('fill', 'none')
             .style('pointer-events', 'all')
-            .call(
-                zoom()
-                    .scaleExtent([1 / 2, 4])
-                    .on('zoom', () => {
-                        element
-                            .select('.content')
-                            .attr('transform', event.transform);
-                    })
-            )
-            .call(
-                zoom().transform,
-                zoomIdentity.translate(this.width / 4, this.height / 2).scale(1)
-            );
+            .call(this.zoom)
+            .call(zoom().transform, this._handleTranslate());
 
-        element
-            .append('g')
+        svg.append('g')
             .attr('class', 'content')
-            .attr(
-                'transform',
-                zoomIdentity.translate(this.width / 4, this.height / 2).scale(1)
-            );
+            .attr('transform', this._handleTranslate());
 
-        return element;
+        this.svg = svg;
     }
 
     _init(root) {
-        var svg = root.append('svg');
+        this.svg = root.append('svg');
 
-        this.svg = this._initZoom(svg);
+        this._initZoom();
     }
 }
 

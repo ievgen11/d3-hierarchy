@@ -27,6 +27,10 @@ class GeoHierarchy extends Component {
     componentDidUpdate() {
         const { data } = this.props;
 
+        if (data.get('children').size <= 0) {
+            return;
+        }
+
         this._d3.updateData(data.toJS());
     }
 
