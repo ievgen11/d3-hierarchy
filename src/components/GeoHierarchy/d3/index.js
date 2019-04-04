@@ -75,6 +75,18 @@ class _d3 {
             .attr('r', 5)
             .attr('cx', 0)
             .attr('cy', 0)
+            .attr('stroke-width', 5)
+            .attr('stroke', d => {
+                if (d.data.type === 'Port') {
+                    return CHILD_COLOR;
+                }
+
+                if (!d.parent) {
+                    return ROOT_COLOR;
+                }
+
+                return d.children ? PARENT_COLOR : PARENT_COLLAPSED_COLOR;
+            })
             .attr('fill', d => {
                 if (d.data.type === 'Port') {
                     return CHILD_COLOR;

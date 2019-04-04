@@ -39,6 +39,14 @@ svg {
     text-underline-position: under;
 }
 
+.node:hover circle {
+    stroke-opacity: 0.7;
+}
+
+.node:active circle {
+    stroke-opacity: 0.5;
+}
+
 .link {
     fill: none;
     stroke: #c3c3c3;
