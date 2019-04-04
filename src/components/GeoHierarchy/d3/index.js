@@ -1,6 +1,6 @@
 import { tree, hierarchy } from 'd3-hierarchy';
 import { zoom, zoomIdentity } from 'd3-zoom';
-import { event } from 'd3-selection';
+import { event, select } from 'd3-selection';
 import 'd3-transition';
 
 import {
@@ -9,7 +9,10 @@ import {
     PARENT_COLOR,
     PARENT_COLLAPSED_COLOR,
     CHILD_COLOR,
-    LINK_COLOR
+    LINK_COLOR,
+    LINK_SELECTED_COLOR,
+    CHILD_SELECTED_COLOR,
+    LINK_HOVER_COLOR
 } from './constants';
 
 import './styles.css';
@@ -29,7 +32,8 @@ class _d3 {
         this.nodeDistance = nodeDistance;
 
         this.tree = tree().nodeSize(nodeSize);
-        this.data = null;
+        this.data = hierarchy({});
+        this.selected = null;
 
         this._init(root);
     }
@@ -40,6 +44,16 @@ class _d3 {
         if (this.data.children) {
             this.data.children.forEach(child => this._collapseNodes(child));
         }
+
+        this._updateD3(this.data);
+    }
+
+    updateSelection(selected) {
+        if (!selected) {
+            return;
+        }
+
+        this.selected = selected;
 
         this._updateD3(this.data);
     }
@@ -132,6 +146,64 @@ class _d3 {
             .style('pointer-events', 'all');
     }
 
+    _handleMouseOver(d) {
+        this.svg
+            .selectAll('path')
+            .filter(
+                node =>
+                    d
+                        .ancestors()
+                        .reverse()
+                        .indexOf(node) >= 0
+            )
+            .transition()
+            .duration(TRANSITION_DURATION)
+            .attr('stroke', LINK_HOVER_COLOR);
+
+        this.svg
+            .selectAll('.indicator')
+            .filter(
+                node =>
+                    d
+                        .ancestors()
+                        .reverse()
+                        .indexOf(node) >= 0
+            )
+            .transition()
+            .duration(TRANSITION_DURATION)
+            .attr('stroke', LINK_HOVER_COLOR)
+            .attr('fill', LINK_HOVER_COLOR);
+    }
+
+    _handleMouseLeave(d) {
+        this.svg
+            .selectAll('path')
+            .filter(
+                node =>
+                    d
+                        .ancestors()
+                        .reverse()
+                        .indexOf(node) >= 0
+            )
+            .transition()
+            .duration(TRANSITION_DURATION)
+            .attr('stroke', LINK_COLOR);
+
+        this._formatIndicator(
+            this.svg
+                .selectAll('.indicator')
+                .filter(
+                    node =>
+                        d
+                            .ancestors()
+                            .reverse()
+                            .indexOf(node) >= 0
+                )
+                .transition()
+                .duration(TRANSITION_DURATION)
+        );
+    }
+
     _generateNodes(target, data) {
         var node = this.svg
             .select('.content')
@@ -139,16 +211,15 @@ class _d3 {
             .data(data, d => d.data.location);
 
         // Update existing stuff
-        this._formatIndicator(node.selectAll('.indicator'));
-        this._formatLabel(node.selectAll('.label'));
-        this._formatOverlay(node.selectAll('.overlay'));
+        // this._formatIndicator(node.selectAll('.indicator'));
+        // this._formatLabel(node.selectAll('.label'));
+        // this._formatOverlay(node.selectAll('.overlay'));
 
         var nodeEnter = node
             .enter()
             .append('g')
             .attr('class', 'node')
-            .attr('transform', () => `translate(${target.y0},${target.x0})`)
-            .on('click', d => this._handleClick(d));
+            .attr('transform', () => `translate(${target.y0},${target.x0})`);
 
         this._formatIndicator(
             nodeEnter
@@ -175,6 +246,11 @@ class _d3 {
         var nodeUpdate = nodeEnter.merge(node);
 
         nodeUpdate
+            .on('click', d => this._handleClick(d))
+            .on('mouseover', d => this._handleMouseOver(d))
+            .on('mouseleave', d => this._handleMouseLeave(d));
+
+        nodeUpdate
             .transition()
             .duration(TRANSITION_DURATION)
             .attr('transform', d => `translate(${d.y},${d.x})`);
@@ -189,18 +265,16 @@ class _d3 {
             .remove();
     }
 
-    _generateLinks(target, data) {
-        var link = this.svg
-            .select('.content')
-            .selectAll('.link')
-            .data(data, d => d.data.location);
-
-        var linkEnter = link
-            .enter()
-            .insert('path', 'g')
-            .attr('class', 'link')
+    _formatLink(node, target) {
+        return node
             .attr('fill', 'none')
-            .attr('stroke', LINK_COLOR)
+            .attr('stroke', d => {
+                if (d.data.location === this.selected) {
+                    return LINK_SELECTED_COLOR;
+                }
+
+                return LINK_COLOR;
+            })
             .attr('stroke-width', 1)
             .attr('d', () =>
                 diagonal(
@@ -208,6 +282,22 @@ class _d3 {
                     { x: target.x0, y: target.y0 }
                 )
             );
+    }
+
+    _generateLinks(target, data) {
+        var link = this.svg
+            .select('.content')
+            .selectAll('.link')
+            .data(data, d => d.data.location);
+
+        this._formatLink(link.selectAll('.link'),target);
+
+        var linkEnter = link
+            .enter()
+            .insert('path', 'g')
+            .attr('class', 'link');
+
+        this._formatLink(linkEnter,target);
 
         var linkUpdate = linkEnter.merge(link);
 

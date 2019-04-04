@@ -19,6 +19,14 @@ class GeoHierarchy extends Component {
         height: 800
     };
 
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            selected: null
+        }
+    }
+
     componentDidMount() {
         const { width, height } = this.props;
         this._d3 = new _d3({
@@ -28,6 +36,8 @@ class GeoHierarchy extends Component {
             nodeSize: [60, 60],
             nodeDistance: 200
         });
+
+        this._d3.updateSelection(this.state.selected);
     }
 
     componentDidUpdate() {
@@ -38,6 +48,7 @@ class GeoHierarchy extends Component {
         }
 
         this._d3.updateData(data.toJS());
+        this._d3.updateSelection('TZZNZ');
     }
 
     render() {
