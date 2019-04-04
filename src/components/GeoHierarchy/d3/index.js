@@ -8,7 +8,8 @@ import {
     ROOT_COLOR,
     PARENT_COLOR,
     PARENT_COLLAPSED_COLOR,
-    CHILD_COLOR
+    CHILD_COLOR,
+    LINK_COLOR
 } from './constants';
 
 import './styles.css';
@@ -134,7 +135,7 @@ class _d3 {
     _generateNodes(target, data) {
         var node = this.svg
             .select('.content')
-            .selectAll('g.node')
+            .selectAll('.node')
             .data(data, d => d.data.location);
 
         // Update existing stuff
@@ -180,8 +181,10 @@ class _d3 {
 
         var nodeExit = node
             .exit()
+            .style('opacity', 1)
             .transition()
             .duration(TRANSITION_DURATION)
+            .style('opacity', 0)
             .attr('transform', () => `translate(${target.y},${target.x})`)
             .remove();
     }
@@ -189,13 +192,16 @@ class _d3 {
     _generateLinks(target, data) {
         var link = this.svg
             .select('.content')
-            .selectAll('path.link')
+            .selectAll('.link')
             .data(data, d => d.data.location);
 
         var linkEnter = link
             .enter()
             .insert('path', 'g')
             .attr('class', 'link')
+            .attr('fill', 'none')
+            .attr('stroke', LINK_COLOR)
+            .attr('stroke-width', 1)
             .attr('d', () =>
                 diagonal(
                     { x: target.x0, y: target.y0 },

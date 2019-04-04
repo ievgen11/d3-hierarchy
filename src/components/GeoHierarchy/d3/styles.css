@@ -46,9 +46,3 @@ svg {
 .node:active circle {
     stroke-opacity: 0.5;
 }
-
-.link {
-    fill: none;
-    stroke: #c3c3c3;
-    stroke-width: 1px;
-}
