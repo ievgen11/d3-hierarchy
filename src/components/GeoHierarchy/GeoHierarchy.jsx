@@ -21,7 +21,13 @@ class GeoHierarchy extends Component {
 
     componentDidMount() {
         const { width, height } = this.props;
-        this._d3 = new _d3(this._root, width, height);
+        this._d3 = new _d3({
+            root: this._root,
+            width: width,
+            height: height,
+            nodeSize: [60, 60],
+            nodeDistance: 200
+        });
     }
 
     componentDidUpdate() {

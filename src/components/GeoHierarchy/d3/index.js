@@ -3,7 +3,13 @@ import { zoom, zoomIdentity } from 'd3-zoom';
 import { event } from 'd3-selection';
 import 'd3-transition';
 
-import { TRANSITION_DURATION } from './constants';
+import {
+    TRANSITION_DURATION,
+    ROOT_COLOR,
+    PARENT_COLOR,
+    PARENT_COLLAPSED_COLOR,
+    CHILD_COLOR
+} from './constants';
 
 import './styles.css';
 
@@ -15,10 +21,13 @@ function diagonal(s, d) {
 }
 
 class _d3 {
-    constructor(root, width, height) {
+    constructor({ root, width, height, nodeSize, nodeDistance }) {
         this.width = width;
         this.height = height;
-        this.tree = tree().nodeSize([60, 60]);
+        this.nodeSize = nodeSize;
+        this.nodeDistance = nodeDistance;
+
+        this.tree = tree().nodeSize(nodeSize);
         this.data = null;
 
         this._init(root);
@@ -26,9 +35,6 @@ class _d3 {
 
     updateData(data) {
         this.data = hierarchy(data, d => d.children);
-
-        this.data.x0 = 0;
-        this.data.y0 = 0;
 
         if (this.data.children) {
             this.data.children.forEach(child => this._collapseNodes(child));
@@ -71,14 +77,14 @@ class _d3 {
             .attr('cy', 0)
             .attr('fill', d => {
                 if (d.data.type === 'Port') {
-                    return '#ffbb1d';
+                    return CHILD_COLOR;
                 }
 
                 if (!d.parent) {
-                    return '#f57c00';
+                    return ROOT_COLOR;
                 }
 
-                return d.children ? '#3B90E3' : '#2F385E';
+                return d.children ? PARENT_COLOR : PARENT_COLLAPSED_COLOR;
             });
     }
 
@@ -198,7 +204,7 @@ class _d3 {
         var data = this.tree(this.data)
             .descendants()
             .map(d => {
-                d.y = d.depth * 200;
+                d.y = d.depth * this.nodeDistance;
                 d.x0 = d.x;
                 d.y0 = d.y;
 
