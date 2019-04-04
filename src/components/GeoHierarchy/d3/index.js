@@ -70,7 +70,7 @@ class _d3 {
         this._updateD3(d);
     }
 
-    _formatCircle(node) {
+    _formatIndicator(node) {
         return node
             .attr('r', 5)
             .attr('cx', 0)
@@ -121,6 +121,16 @@ class _d3 {
             });
     }
 
+    _formatOverlay(node) {
+        return node
+            .attr('x', -25)
+            .attr('y', -25)
+            .attr('height', 50)
+            .attr('width', 50)
+            .style('fill', 'none')
+            .style('pointer-events', 'all');
+    }
+
     _generateNodes(target, data) {
         var node = this.svg
             .select('.content')
@@ -128,8 +138,9 @@ class _d3 {
             .data(data, d => d.data.location);
 
         // Update existing stuff
-        this._formatCircle(node.selectAll('circle'));
-        this._formatLabel(node.selectAll('text'));
+        this._formatIndicator(node.selectAll('.indicator'));
+        this._formatLabel(node.selectAll('.label'));
+        this._formatOverlay(node.selectAll('.overlay'));
 
         var nodeEnter = node
             .enter()
@@ -138,9 +149,10 @@ class _d3 {
             .attr('transform', () => `translate(${target.y0},${target.x0})`)
             .on('click', d => this._handleClick(d));
 
-        this._formatCircle(
+        this._formatIndicator(
             nodeEnter
                 .append('circle')
+                .attr('class', 'indicator')
                 .style('opacity', 0)
                 .transition()
                 .duration(TRANSITION_DURATION)
@@ -150,11 +162,14 @@ class _d3 {
         this._formatLabel(
             nodeEnter
                 .append('text')
+                .attr('class', 'label')
                 .style('opacity', 0)
                 .transition()
                 .duration(TRANSITION_DURATION)
                 .style('opacity', 1)
         );
+
+        this._formatOverlay(nodeEnter.append('rect').attr('class', 'overlay'));
 
         var nodeUpdate = nodeEnter.merge(node);
 
@@ -169,10 +184,6 @@ class _d3 {
             .duration(TRANSITION_DURATION)
             .attr('transform', () => `translate(${target.y},${target.x})`)
             .remove();
-
-        nodeExit.select('rect').style('opacity', 1e-6);
-        nodeExit.select('rect').attr('stroke-opacity', 1e-6);
-        nodeExit.select('text').style('fill-opacity', 1e-6);
     }
 
     _generateLinks(target, data) {
