@@ -15,8 +15,8 @@ class GeoHierarchy extends Component {
     };
 
     static defaultProps = {
-        width: 1280,
-        height: 800
+        width: 900,
+        height: 500
     };
 
     constructor(props) {
@@ -37,7 +37,7 @@ class GeoHierarchy extends Component {
             nodeDistance: 200
         });
 
-        this._d3.updateSelection(this.state.selected);
+        //this._d3.updateSelection(this.state.selected);
     }
 
     componentDidUpdate() {
@@ -48,7 +48,8 @@ class GeoHierarchy extends Component {
         }
 
         this._d3.updateData(data.toJS());
-        this._d3.updateSelection('TZZNZ');
+
+        setTimeout(() => this._d3.updateSelection('ESACE'), 3000);
     }
 
     render() {

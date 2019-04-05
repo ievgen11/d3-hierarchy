@@ -42,20 +42,91 @@ class _d3 {
         this.data = hierarchy(data, d => d.children);
 
         if (this.data.children) {
-            this.data.children.forEach(child => this._collapseDescendants(child));
+            this.data.children.forEach(child =>
+                this._collapseDescendants(child)
+            );
         }
 
         this._updateD3(this.data);
     }
 
     updateSelection(selected) {
-        if (!selected) {
-            return;
-        }
 
         this.selected = selected;
 
-        this._updateD3(this.data);
+        const nodes = this._searchTree(this.data, selected, []);
+
+        if (nodes) {
+           this._expandSelected(nodes);
+        }
+    }
+
+    _expandSelected(nodes) {
+        this._collapseDescendants(this.data);
+
+        nodes.forEach(node => {
+            this._expandChildren(node);
+            this._updateD3(node);
+        });
+
+        const foundNode = nodes.reverse()[0];
+
+        this._highlightNode(foundNode);
+
+        //this._updateD3(foundNode);
+    }
+
+    _highlightNode(d) {
+
+        this.svg
+            .selectAll('path')
+            .attr('stroke', LINK_COLOR)
+            .filter(
+                node =>
+                    d
+                        .ancestors()
+                        .reverse()
+                        .indexOf(node) >= 0
+            )
+            .attr('stroke', LINK_HOVER_COLOR);
+
+        this.svg
+            .selectAll('.indicator')
+            .filter(
+                node =>
+                    d
+                        .ancestors()
+                        .reverse()
+                        .indexOf(node) >= 0
+            )
+            .attr('stroke', LINK_HOVER_COLOR)
+            .attr('fill', LINK_HOVER_COLOR);
+    }
+
+    _searchTree(node, searchString, pathArray) {
+        if (node.data.location === searchString) {
+            pathArray.push(node);
+
+            return pathArray;
+        }
+
+        const children = node.children ? node.children : node._children;
+
+        if (!children) {
+            return false;
+        }
+
+        for (var i = 0; i < children.length; i++) {
+            pathArray.push(node);
+
+            var found = this._searchTree(children[i], searchString, pathArray);
+
+            if (found) {
+                return found;
+            }
+
+            pathArray.pop();
+        }
     }
 
     _collapseDescendants(d) {
@@ -158,6 +229,7 @@ class _d3 {
     _handleMouseOver(d) {
         this.svg
             .selectAll('path')
+            .attr('stroke', LINK_COLOR)
             .filter(
                 node =>
                     d
@@ -180,26 +252,13 @@ class _d3 {
             .attr('fill', LINK_HOVER_COLOR);
     }
 
-    _handleMouseLeave(d) {
+    _handleMouseLeave() {
         this.svg
             .selectAll('path')
-            .filter(
-                node =>
-                    d
-                        .ancestors()
-                        .reverse()
-                        .indexOf(node) >= 0
-            )
             .attr('stroke', LINK_COLOR);
 
         this._formatIndicator(
-            this.svg.selectAll('.indicator').filter(
-                node =>
-                    d
-                        .ancestors()
-                        .reverse()
-                        .indexOf(node) >= 0
-            )
+            this.svg.selectAll('.indicator')
         );
     }
 
