@@ -9,4 +9,4 @@ export const CHILD_COLOR = '#ffbb1d';
 export const CHILD_SELECTED_COLOR = '#ff7140';
 export const LINK_COLOR = '#c3c3c3';
 export const LINK_SELECTED_COLOR = '#ff7140';
-export const LINK_HOVER_COLOR = '#f57c00';
+export const HOVER_COLOR = '#f57c00';

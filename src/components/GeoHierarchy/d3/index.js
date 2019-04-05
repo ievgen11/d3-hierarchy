@@ -12,7 +12,7 @@ import {
     LINK_COLOR,
     LINK_SELECTED_COLOR,
     CHILD_SELECTED_COLOR,
-    LINK_HOVER_COLOR
+    HOVER_COLOR
 } from './constants';
 
 import './styles.css';
@@ -51,13 +51,12 @@ class _d3 {
     }
 
     updateSelection(selected) {
-
         this.selected = selected;
 
         const nodes = this._searchTree(this.data, selected, []);
 
         if (nodes) {
-           this._expandSelected(nodes);
+            this._expandSelected(nodes);
         }
     }
 
@@ -71,13 +70,12 @@ class _d3 {
 
         const foundNode = nodes.reverse()[0];
 
-        this._highlightNode(foundNode);
+        //this._highlightNode(foundNode);
 
         //this._updateD3(foundNode);
     }
 
     _highlightNode(d) {
-
         this.svg
             .selectAll('path')
             .attr('stroke', LINK_COLOR)
@@ -88,7 +86,7 @@ class _d3 {
                         .reverse()
                         .indexOf(node) >= 0
             )
-            .attr('stroke', LINK_HOVER_COLOR);
+            .attr('stroke', HOVER_COLOR);
 
         this.svg
             .selectAll('.indicator')
@@ -99,8 +97,8 @@ class _d3 {
                         .reverse()
                         .indexOf(node) >= 0
             )
-            .attr('stroke', LINK_HOVER_COLOR)
-            .attr('fill', LINK_HOVER_COLOR);
+            .attr('stroke', HOVER_COLOR)
+            .attr('fill', HOVER_COLOR);
     }
 
     _searchTree(node, searchString, pathArray) {
@@ -171,7 +169,11 @@ class _d3 {
             .attr('cx', 0)
             .attr('cy', 0)
             .attr('stroke-width', 5)
-            .attr('stroke', d => {
+            .attr('stroke', function(d) {
+                if (this.getAttribute('is-hover') === 'true') {
+                    return HOVER_COLOR;
+                }
+
                 if (d.data.type === 'Port') {
                     return CHILD_COLOR;
                 }
@@ -182,7 +184,11 @@ class _d3 {
 
                 return d.children ? PARENT_COLOR : PARENT_COLLAPSED_COLOR;
             })
-            .attr('fill', d => {
+            .attr('fill', function(d) {
+                if (this.getAttribute('is-hover') === 'true') {
+                    return HOVER_COLOR;
+                }
+
                 if (d.data.type === 'Port') {
                     return CHILD_COLOR;
                 }
@@ -227,38 +233,48 @@ class _d3 {
     }
 
     _handleMouseOver(d) {
-        this.svg
-            .selectAll('path')
-            .attr('stroke', LINK_COLOR)
-            .filter(
-                node =>
-                    d
-                        .ancestors()
-                        .reverse()
-                        .indexOf(node) >= 0
-            )
-            .attr('stroke', LINK_HOVER_COLOR);
-
-        this.svg
-            .selectAll('.indicator')
-            .filter(
-                node =>
-                    d
-                        .ancestors()
-                        .reverse()
-                        .indexOf(node) >= 0
-            )
-            .attr('stroke', LINK_HOVER_COLOR)
-            .attr('fill', LINK_HOVER_COLOR);
+        this._formatLink(
+            this.svg
+                .selectAll('path')
+                .filter(
+                    node =>
+                        d
+                            .ancestors()
+                            .reverse()
+                            .indexOf(node) >= 0
+                )
+                .attr('is-hover', 'true')
+        );
+        this._formatIndicator(
+            this.svg
+                .selectAll('.indicator')
+                .filter(
+                    node =>
+                        d
+                            .ancestors()
+                            .reverse()
+                            .indexOf(node) >= 0
+                )
+                .attr('is-hover', 'true')
+        );
     }
 
     _handleMouseLeave() {
-        this.svg
-            .selectAll('path')
-            .attr('stroke', LINK_COLOR);
-
+        this._formatLink(
+            this.svg
+                .selectAll('path')
+                .filter(function() {
+                    return this.getAttribute('is-hover') === 'true';
+                })
+                .attr('is-hover', null)
+        );
         this._formatIndicator(
-            this.svg.selectAll('.indicator')
+            this.svg
+                .selectAll('.indicator')
+                .filter(function() {
+                    return this.getAttribute('is-hover') === 'true';
+                })
+                .attr('is-hover', null)
         );
     }
 
@@ -268,15 +284,24 @@ class _d3 {
             .selectAll('.node')
             .data(data, d => d.data.location);
 
-        this._formatIndicator(node.selectAll('.indicator'));
-        this._formatLabel(node.selectAll('.label'));
-        this._formatOverlay(node.selectAll('.overlay'));
-
         var nodeEnter = node
             .enter()
             .append('g')
             .attr('class', 'node')
             .attr('transform', () => `translate(${target.y0},${target.x0})`);
+
+        var nodeExit = node
+            .exit()
+            .style('opacity', 1)
+            .transition()
+            .duration(TRANSITION_DURATION)
+            .style('opacity', 0)
+            .attr('transform', () => `translate(${target.y},${target.x})`)
+            .remove();
+
+        this._formatIndicator(node.selectAll('.indicator'));
+        this._formatLabel(node.selectAll('.label'));
+        this._formatOverlay(node.selectAll('.overlay'));
 
         this._formatIndicator(
             nodeEnter
@@ -311,53 +336,32 @@ class _d3 {
             .transition()
             .duration(TRANSITION_DURATION)
             .attr('transform', d => `translate(${d.y},${d.x})`);
-
-        var nodeExit = node
-            .exit()
-            .style('opacity', 1)
-            .transition()
-            .duration(TRANSITION_DURATION)
-            .style('opacity', 0)
-            .attr('transform', () => `translate(${target.y},${target.x})`)
-            .remove();
     }
 
-    _formatLink(node, target) {
+    _formatLink(node) {
         return node
             .attr('fill', 'none')
-            .attr('stroke', d => {
+            .attr('stroke', function(d) {
+                if (this.getAttribute('is-hover') === 'true') {
+                    return HOVER_COLOR;
+                }
+
                 return LINK_COLOR;
             })
-            .attr('stroke-width', 1)
-            .attr('d', () =>
-                diagonal(
-                    { x: target.x0, y: target.y0 },
-                    { x: target.x0, y: target.y0 }
-                )
-            );
+            .attr('stroke-width', 1);
     }
 
     _generateLinks(target, data) {
+        // Existing
         var link = this.svg
             .select('.content')
             .selectAll('.link')
             .data(data, d => d.data.location);
 
-        this._formatLink(link.selectAll('.link'), target);
-
         var linkEnter = link
             .enter()
             .insert('path', 'g')
             .attr('class', 'link');
-
-        this._formatLink(linkEnter, target);
-
-        var linkUpdate = linkEnter.merge(link);
-
-        linkUpdate
-            .transition()
-            .duration(TRANSITION_DURATION)
-            .attr('d', d => (d && d.parent ? diagonal(d, d.parent) : null));
 
         var linkExit = link
             .exit()
@@ -370,6 +374,33 @@ class _d3 {
                 )
             )
             .remove();
+
+        this._formatLink(
+            link
+                .selectAll('.link')
+                .attr('d', () =>
+                    diagonal(
+                        { x: target.x0, y: target.y0 },
+                        { x: target.x0, y: target.y0 }
+                    )
+                )
+        );
+
+        this._formatLink(
+            linkEnter.attr('d', () =>
+                diagonal(
+                    { x: target.x0, y: target.y0 },
+                    { x: target.x0, y: target.y0 }
+                )
+            )
+        );
+
+        var linkUpdate = linkEnter.merge(link);
+
+        linkUpdate
+            .transition()
+            .duration(TRANSITION_DURATION)
+            .attr('d', d => (d && d.parent ? diagonal(d, d.parent) : null));
     }
 
     _updateD3(target) {
