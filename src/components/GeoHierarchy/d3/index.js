@@ -209,10 +209,9 @@ class _d3 {
             .selectAll('.node')
             .data(data, d => d.data.location);
 
-        // Update existing stuff
-        // this._formatIndicator(node.selectAll('.indicator'));
-        // this._formatLabel(node.selectAll('.label'));
-        // this._formatOverlay(node.selectAll('.overlay'));
+        this._formatIndicator(node.selectAll('.indicator'));
+        this._formatLabel(node.selectAll('.label'));
+        this._formatOverlay(node.selectAll('.overlay'));
 
         var nodeEnter = node
             .enter()
