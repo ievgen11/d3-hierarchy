@@ -10,8 +10,7 @@ import {
     PARENT_COLLAPSED_COLOR,
     CHILD_COLOR,
     LINK_COLOR,
-    LINK_SELECTED_COLOR,
-    CHILD_SELECTED_COLOR,
+    SELECTED_COLOR,
     HOVER_COLOR
 } from './constants';
 
@@ -63,42 +62,48 @@ class _d3 {
     _expandSelected(nodes) {
         this._collapseDescendants(this.data);
 
-        nodes.forEach(node => {
-            this._expandChildren(node);
-            this._updateD3(node);
-        });
+        for (var i = 0, len = nodes.length; i < len; i++) {
+            this._expandChildren(nodes[i]);
+            this._updateD3(nodes[i]);
 
-        const foundNode = nodes.reverse()[0];
+            if (i === nodes.length - 1) {
+                setTimeout(() => {
+                    this._highlightNode(nodes[i - 1]);
+                    this._zoomTo(nodes[i - 1]);
+                }, 1000);
+            }
+        }
+    }
 
-        //this._highlightNode(foundNode);
-
-        //this._updateD3(foundNode);
+    _zoomTo(d) {
+        console.log('Zoom to: ', d);
     }
 
     _highlightNode(d) {
-        this.svg
-            .selectAll('path')
-            .attr('stroke', LINK_COLOR)
-            .filter(
-                node =>
-                    d
-                        .ancestors()
-                        .reverse()
-                        .indexOf(node) >= 0
-            )
-            .attr('stroke', HOVER_COLOR);
-
-        this.svg
-            .selectAll('.indicator')
-            .filter(
-                node =>
-                    d
-                        .ancestors()
-                        .reverse()
-                        .indexOf(node) >= 0
-            )
-            .attr('stroke', HOVER_COLOR)
-            .attr('fill', HOVER_COLOR);
+        this._formatLink(
+            this.svg
+                .selectAll('path')
+                .filter(
+                    node =>
+                        d
+                            .ancestors()
+                            .reverse()
+                            .indexOf(node) >= 0
+                )
+                .attr('is-selected', 'true')
+        );
+        this._formatIndicator(
+            this.svg
+                .selectAll('.indicator')
+                .filter(
+                    node =>
+                        d
+                            .ancestors()
+                            .reverse()
+                            .indexOf(node) >= 0
+                )
+                .attr('is-selected', 'true')
+        );
     }
 
     _searchTree(node, searchString, pathArray) {
@@ -170,6 +175,10 @@ class _d3 {
             .attr('cy', 0)
             .attr('stroke-width', 5)
             .attr('stroke', function(d) {
+                if (this.getAttribute('is-selected') === 'true') {
+                    return SELECTED_COLOR;
+                }
+
                 if (this.getAttribute('is-hover') === 'true') {
                     return HOVER_COLOR;
                 }
@@ -185,6 +194,10 @@ class _d3 {
                 return d.children ? PARENT_COLOR : PARENT_COLLAPSED_COLOR;
             })
             .attr('fill', function(d) {
+                if (this.getAttribute('is-selected') === 'true') {
+                    return SELECTED_COLOR;
+                }
+
                 if (this.getAttribute('is-hover') === 'true') {
                     return HOVER_COLOR;
                 }
@@ -342,6 +355,10 @@ class _d3 {
         return node
             .attr('fill', 'none')
             .attr('stroke', function(d) {
+                if (this.getAttribute('is-selected') === 'true') {
+                    return SELECTED_COLOR;
+                }
+
                 if (this.getAttribute('is-hover') === 'true') {
                     return HOVER_COLOR;
                 }
@@ -418,8 +435,8 @@ class _d3 {
         this._generateLinks(target, data);
     }
 
-    _handleTranslate() {
-        return zoomIdentity.translate(this.width / 3, this.height / 2).scale(1);
+    _handleTranslate(x, y, scale) {
+        return zoomIdentity.translate(x, y).scale(scale);
     }
 
     _setZoom(element) {
@@ -441,11 +458,11 @@ class _d3 {
             .style('fill', 'none')
             .style('pointer-events', 'all')
             .call(this.zoom)
-            .call(zoom().transform, this._handleTranslate());
+            .call(zoom().transform, this._handleTranslate(this.width / 3, this.height / 2, 1));
 
         svg.append('g')
             .attr('class', 'content')
-            .attr('transform', this._handleTranslate());
+            .attr('transform', this._handleTranslate(this.width / 3, this.height / 2, 1));
 
         this.svg = svg;
     }
