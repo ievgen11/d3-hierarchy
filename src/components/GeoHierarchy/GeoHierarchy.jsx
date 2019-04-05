@@ -50,6 +50,7 @@ class GeoHierarchy extends Component {
         this._d3.updateData(data.toJS());
 
         setTimeout(() => this._d3.updateSelection('ESACE'), 1000);
+        setTimeout(() => this._d3.resetSelection(), 3000);
     }
 
     render() {

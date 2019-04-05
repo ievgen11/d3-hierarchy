@@ -59,6 +59,13 @@ class _d3 {
         }
     }
 
+    resetSelection() {
+        this.selected = null;
+
+        this._unselectNode();
+        this._updateD3(this.data);
+    }
+
     _expandSelected(nodes) {
         this._collapseDescendants(this.data);
 
@@ -68,7 +75,7 @@ class _d3 {
 
             if (i === nodes.length - 1) {
                 setTimeout(() => {
-                    this._highlightNode(nodes[i - 1]);
+                    this._selectNode(nodes[i - 1]);
                     this._zoomTo(nodes[i - 1]);
                 }, 1000);
             }
@@ -79,7 +86,26 @@ class _d3 {
         console.log('Zoom to: ', d);
     }
 
-    _highlightNode(d) {
+    _unselectNode() {
+        this._formatLink(
+            this.svg
+                .selectAll('path')
+                .filter(function() {
+                    return this.getAttribute('is-selected') === 'true';
+                })
+                .attr('is-selected', null)
+        );
+        this._formatIndicator(
+            this.svg
+                .selectAll('.indicator')
+                .filter(function() {
+                    return this.getAttribute('is-selected') === 'true';
+                })
+                .attr('is-selected', null)
+        );
+    }
+
+    _selectNode(d) {
         this._formatLink(
             this.svg
                 .selectAll('path')
