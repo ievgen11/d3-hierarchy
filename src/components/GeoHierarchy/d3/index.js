@@ -42,7 +42,7 @@ class _d3 {
         this.data = hierarchy(data, d => d.children);
 
         if (this.data.children) {
-            this.data.children.forEach(child => this._collapseNodes(child));
+            this.data.children.forEach(child => this._collapseDescendants(child));
         }
 
         this._updateD3(this.data);
@@ -58,12 +58,23 @@ class _d3 {
         this._updateD3(this.data);
     }
 
-    _collapseNodes(d) {
+    _collapseDescendants(d) {
         if (d.children) {
             d._children = d.children;
-            d._children.forEach(child => this._collapseNodes(child));
+            d._children.forEach(child => this._collapseDescendants(child));
             d.children = null;
         }
+
+        return d;
+    }
+
+    _expandChildren(d) {
+        if (d.children === null) {
+            d.children = d._children;
+            d._children = null;
+        }
+
+        return d;
     }
 
     _handleClick(d) {
@@ -75,11 +86,9 @@ class _d3 {
         }
 
         if (d.children) {
-            d._children = d.children;
-            d.children = null;
+            this._collapseDescendants(d);
         } else {
-            d.children = d._children;
-            d._children = null;
+            this._expandChildren(d);
         }
 
         this._updateD3(d);
@@ -156,8 +165,6 @@ class _d3 {
                         .reverse()
                         .indexOf(node) >= 0
             )
-            .transition()
-            .duration(TRANSITION_DURATION)
             .attr('stroke', LINK_HOVER_COLOR);
 
         this.svg
@@ -169,8 +176,6 @@ class _d3 {
                         .reverse()
                         .indexOf(node) >= 0
             )
-            .transition()
-            .duration(TRANSITION_DURATION)
             .attr('stroke', LINK_HOVER_COLOR)
             .attr('fill', LINK_HOVER_COLOR);
     }
@@ -185,22 +190,16 @@ class _d3 {
                         .reverse()
                         .indexOf(node) >= 0
             )
-            .transition()
-            .duration(TRANSITION_DURATION)
             .attr('stroke', LINK_COLOR);
 
         this._formatIndicator(
-            this.svg
-                .selectAll('.indicator')
-                .filter(
-                    node =>
-                        d
-                            .ancestors()
-                            .reverse()
-                            .indexOf(node) >= 0
-                )
-                .transition()
-                .duration(TRANSITION_DURATION)
+            this.svg.selectAll('.indicator').filter(
+                node =>
+                    d
+                        .ancestors()
+                        .reverse()
+                        .indexOf(node) >= 0
+            )
         );
     }
 
@@ -269,10 +268,6 @@ class _d3 {
         return node
             .attr('fill', 'none')
             .attr('stroke', d => {
-                if (d.data.location === this.selected) {
-                    return LINK_SELECTED_COLOR;
-                }
-
                 return LINK_COLOR;
             })
             .attr('stroke-width', 1)
@@ -290,14 +285,14 @@ class _d3 {
             .selectAll('.link')
             .data(data, d => d.data.location);
 
-        this._formatLink(link.selectAll('.link'),target);
+        this._formatLink(link.selectAll('.link'), target);
 
         var linkEnter = link
             .enter()
             .insert('path', 'g')
             .attr('class', 'link');
 
-        this._formatLink(linkEnter,target);
+        this._formatLink(linkEnter, target);
 
         var linkUpdate = linkEnter.merge(link);
 
