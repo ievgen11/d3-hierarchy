@@ -6,8 +6,7 @@ import 'd3-transition';
 import {
     TRANSITION_DURATION,
     ROOT_COLOR,
-    PARENT_COLOR,
-    PARENT_COLLAPSED_COLOR,
+    NODE_COLOR,
     CHILD_COLOR,
     LINK_COLOR,
     SELECTED_COLOR,
@@ -55,6 +54,7 @@ class _d3 {
         const nodes = this._searchTree(this.data, selected, []);
 
         if (nodes) {
+            this._unselectNodes();
             this._expandSelected(nodes);
         }
     }
@@ -62,7 +62,7 @@ class _d3 {
     resetSelection() {
         this.selected = null;
 
-        this._unselectNode();
+        this._unselectNodes();
         this._updateD3(this.data);
     }
 
@@ -77,7 +77,7 @@ class _d3 {
                 setTimeout(() => {
                     this._selectNode(nodes[i - 1]);
                     this._zoomTo(nodes[i - 1]);
-                }, 1000);
+                }, TRANSITION_DURATION);
             }
         }
     }
@@ -86,7 +86,7 @@ class _d3 {
         console.log('Zoom to: ', d);
     }
 
-    _unselectNode() {
+    _unselectNodes() {
         this._formatLink(
             this.svg
                 .selectAll('path')
@@ -217,7 +217,7 @@ class _d3 {
                     return ROOT_COLOR;
                 }
 
-                return d.children ? PARENT_COLOR : PARENT_COLLAPSED_COLOR;
+                return NODE_COLOR;
             })
             .attr('fill', function(d) {
                 if (this.getAttribute('is-selected') === 'true') {
@@ -236,7 +236,7 @@ class _d3 {
                     return ROOT_COLOR;
                 }
 
-                return d.children ? PARENT_COLOR : PARENT_COLLAPSED_COLOR;
+                return NODE_COLOR;
             });
     }
 
