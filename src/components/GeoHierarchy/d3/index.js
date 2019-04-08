@@ -46,6 +46,7 @@ class _d3 {
         }
 
         this._updateD3(this.data);
+        this._zoomToPosition(this.nodeDistance / 2, 0, 1);
     }
 
     updateSelection(selected) {
@@ -63,6 +64,7 @@ class _d3 {
         this.selected = null;
 
         this._unselectNodes();
+        this._zoomToPosition(this.nodeDistance / 2, 0, 1);
         this._updateD3(this.data);
     }
 
@@ -75,15 +77,13 @@ class _d3 {
 
             if (i === nodes.length - 1) {
                 setTimeout(() => {
+                    const { y, x } = select(nodes[i - 1]).node();
+
                     this._selectNode(nodes[i - 1]);
-                    this._zoomTo(nodes[i - 1]);
+                    this._zoomToPosition(y, x, 1.5);
                 }, TRANSITION_DURATION);
             }
         }
-    }
-
-    _zoomTo(d) {
-        console.log('Zoom to: ', d);
     }
 
     _unselectNodes() {
@@ -319,7 +319,7 @@ class _d3 {
 
     _generateNodes(target, data) {
         var node = this.svg
-            .select('.content')
+            .select('.container')
             .selectAll('.node')
             .data(data, d => d.data.location);
 
@@ -397,7 +397,7 @@ class _d3 {
     _generateLinks(target, data) {
         // Existing
         var link = this.svg
-            .select('.content')
+            .select('.container')
             .selectAll('.link')
             .data(data, d => d.data.location);
 
@@ -461,42 +461,32 @@ class _d3 {
         this._generateLinks(target, data);
     }
 
-    _handleTranslate(x, y, scale) {
-        return zoomIdentity.translate(x, y).scale(scale);
-    }
-
-    _setZoom(element) {
-        this.zoom = zoom()
-            .scaleExtent([0.5, 2])
-            .on('zoom', () => {
-                element.select('.content').attr('transform', event.transform);
-            });
-    }
-
-    _initZoom() {
-        const svg = this.svg;
-        this._setZoom(svg);
-
-        svg.append('rect')
-            .attr('class', 'zoom')
-            .attr('width', this.width)
-            .attr('height', this.height)
-            .style('fill', 'none')
-            .style('pointer-events', 'all')
+    _zoomToPosition(y, x, scale) {
+        this.svg
             .call(this.zoom)
-            .call(zoom().transform, this._handleTranslate(this.width / 3, this.height / 2, 1));
-
-        svg.append('g')
-            .attr('class', 'content')
-            .attr('transform', this._handleTranslate(this.width / 3, this.height / 2, 1));
-
-        this.svg = svg;
+            .transition()
+            .duration(TRANSITION_DURATION)
+            .call(
+                this.zoom.transform,
+                zoomIdentity
+                    .translate(
+                        -y * scale + this.width / 2,
+                        -x * scale + this.height / 2
+                    )
+                    .scale(scale)
+            );
     }
 
     _init(root) {
-        this.svg = root.append('svg');
+        this.svg = root.append('svg').style('pointer-events', 'all');
 
-        this._initZoom();
+        this.svg.append('g').attr('class', 'container');
+
+        this.zoom = zoom()
+            .scaleExtent([0.5, 2])
+            .on('zoom', () =>
+                this.svg.select('.container').attr('transform', event.transform)
+            );
     }
 }
 
