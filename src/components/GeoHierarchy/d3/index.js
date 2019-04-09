@@ -402,6 +402,7 @@ class _d3 {
             .enter()
             .append('g')
             .attr('class', 'node')
+            .attr('cursor', 'pointer')
             .attr('transform', () => `translate(${target.y0},${target.x0})`);
 
         var nodeExit = node

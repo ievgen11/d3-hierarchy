@@ -11,10 +11,6 @@
     left: 0;
 }
 
-.node {
-    cursor: pointer;
-}
-
 .node text {
     font-family: Roboto,sans-serif;
     font-size: 12px;
