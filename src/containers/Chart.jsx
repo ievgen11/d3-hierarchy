@@ -13,7 +13,8 @@ class Chart extends Component {
         selectedValue: PropTypes.string,
         isError: PropTypes.bool.isRequired,
         isPending: PropTypes.bool.isRequired,
-        getDataAction: PropTypes.func.isRequired
+        getDataAction: PropTypes.func.isRequired,
+        resetSelectedValue: PropTypes.func.isRequired
     };
 
     componentDidMount() {
@@ -23,13 +24,14 @@ class Chart extends Component {
     }
 
     render() {
-        const { data, isPending, isError, selectedValue } = this.props;
+        const { data, isPending, isError, selectedValue, resetSelectedValue } = this.props;
 
         return <GeoHierarchy
             data={data}
             isPending={isPending}
             isError={isError}
             selectedValue={selectedValue}
+            onSelectionClear={() => resetSelectedValue()}
         />;
     }
 }
@@ -42,7 +44,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    getDataAction: () => dispatch(actions.getData())
+    getDataAction: () => dispatch(actions.getData()),
+    resetSelectedValue: () => dispatch(actions.resetSelectedValue())
 });
 
 const ConnectedChart = withRouter(

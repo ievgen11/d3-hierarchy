@@ -21,7 +21,8 @@ import {
     DEFAULT_SCALE_STEP,
     DEFAULT_UNIQUE_ID_KEY,
     DEFAULT_WIDTH,
-    DEFAULT_SVG_CLASS
+    DEFAULT_SVG_CLASS,
+    DEFAULT_ON_SELECTION_CLEAR
 } from './constants';
 
 import './styles.css';
@@ -46,7 +47,8 @@ class _d3 {
         uniqueIdKey = DEFAULT_UNIQUE_ID_KEY,
         onNodeClick = DEFAULT_ON_NODE_CLICK,
         formatLabelText = DEFAULT_FORMAT_LABEL_TEXT,
-        svgClass = DEFAULT_SVG_CLASS
+        svgClass = DEFAULT_SVG_CLASS,
+        onSelectionClear = DEFAULT_ON_SELECTION_CLEAR
     }) {
         this.config = {
             width,
@@ -59,7 +61,8 @@ class _d3 {
             uniqueIdKey,
             onNodeClick,
             formatLabelText,
-            svgClass
+            svgClass,
+            onSelectionClear
         };
 
         this.tree = tree().nodeSize(nodeSize);
@@ -97,6 +100,8 @@ class _d3 {
         this.selected = null;
 
         this._unselectNodes();
+
+        this._getConfig('onSelectionClear')();
 
         this._updateD3(this.data);
     }
@@ -260,6 +265,7 @@ class _d3 {
         this._getConfig('onNodeClick')(d);
 
         if (this._childrenKeySelector(d)) {
+            this.resetSelection();
             this._collapseDescendants(d);
         } else {
             this._expandChildren(d);

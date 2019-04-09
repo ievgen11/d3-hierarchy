@@ -18,6 +18,16 @@ class Selector extends Component {
         };
     }
 
+    componentDidUpdate(prevProps) {
+        if (this.props.selectedValue !== prevProps.selectedValue) {
+            if (this.props.selectedValue === '') {
+                return this.setState({ selectedValue: ''});
+            }
+
+            this.setState({ selectedValue: this.props.selectedValue})
+        }
+    }
+
     render() {
         const { setSelectedValue, resetSelectedValue } = this.props;
         const { selectedValue } = this.state;

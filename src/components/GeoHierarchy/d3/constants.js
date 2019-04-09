@@ -11,6 +11,7 @@ export const DEFAULT_CHILDREN_KEY = 'children';
 export const DEFAULT_UNIQUE_ID_KEY = 'id';
 export const DEFAULT_ON_NODE_CLICK = () => null;
 export const DEFAULT_FORMAT_LABEL_TEXT = node => node.data.name;
+export const DEFAULT_ON_SELECTION_CLEAR = () => null;
 
 // COLORS
 export const ROOT_COLOR = '#ff7140';

@@ -29,7 +29,7 @@ class GeoHierarchy extends Component {
     }
 
     componentDidMount() {
-        const { width, height } = this.props;
+        const { width, height, onSelectionClear } = this.props;
         this._d3 = new _d3({
             root: this._root,
             width: width,
@@ -39,11 +39,15 @@ class GeoHierarchy extends Component {
             onNodeClick: node => {
                 if (node.data.type === 'Port') {
                     window
-                        .open(`http://locode.info/${node.data.location}`, '_blank')
+                        .open(
+                            `http://locode.info/${node.data.location}`,
+                            '_blank'
+                        )
                         .focus();
                     return;
                 }
             },
+            onSelectionClear: onSelectionClear,
             formatLabelText: node => {
                 if (node.data.type === 'Port') {
                     return `${node.data.name} (${node.data.location})`;
@@ -70,9 +74,9 @@ class GeoHierarchy extends Component {
 
         if (this.props.selectedValue !== prevProps.selectedValue) {
             if (this.props.selectedValue === '') {
-                return this._d3.resetSelection()
+                return this._d3.resetSelection();
             }
-            this._d3.updateSelection(this.props.selectedValue)
+            this._d3.updateSelection(this.props.selectedValue);
         }
     }
 
@@ -94,10 +98,14 @@ class GeoHierarchy extends Component {
                     <button onClick={() => this._d3.zoomIn()}>+</button>
                     <button onClick={() => this._d3.resetZoom()}>O</button>
                     <button onClick={() => this._d3.zoomOut()}>-</button>
-                    <br></br>
-                    <button disabled={selectedValue === ''} onClick={() => this._d3.resetSelection()}>reset</button>
-                    <br></br>
-                    <button onClick={() => this._d3.reload()}>reload</button>
+                    <br />
+                    {selectedValue !== '' ? (
+                        <button onClick={() => this._d3.resetSelection()}>
+                            Clear
+                        </button>
+                    ) : null}
+                    <br />
+                    <button onClick={() => this._d3.reload()}>Reload</button>
                 </div>
             </div>
         );
