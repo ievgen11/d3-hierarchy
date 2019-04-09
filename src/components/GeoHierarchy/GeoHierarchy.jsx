@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { select } from 'd3-selection';
-import cx from 'classnames';
 
 import _d3 from './d3';
 
@@ -11,12 +10,13 @@ class GeoHierarchy extends Component {
     static propTypes = {
         data: PropTypes.object,
         width: PropTypes.number,
-        height: PropTypes.number
+        height: PropTypes.number,
+        selectedValue: PropTypes.string
     };
 
     static defaultProps = {
         width: 1280,
-        height: 500
+        height: 800
     };
 
     constructor(props) {
@@ -34,35 +34,36 @@ class GeoHierarchy extends Component {
             width: width,
             height: height,
             nodeSize: [60, 60],
-            nodeDistance: 200
+            nodeDistance: 200,
+            scaleStep: 0.25
         });
-
-        //this._d3.updateSelection(this.state.selected);
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps) {
         const { data } = this.props;
 
         if (data.get('children').size <= 0) {
             return;
         }
 
-        this._d3.updateData(data.toJS());
+        if (!data.equals(prevProps.data)) {
+            this._d3.updateData(data.toJS());
+        }
 
-        // setTimeout(() => this._d3.updateSelection('UAMPW'), 2000);
-        // setTimeout(() => this._d3.updateSelection('MDGIU'), 4000);
-        // setTimeout(() => this._d3.updateSelection('TWKEL'), 6000);
-        // setTimeout(() => this._d3.updateSelection('SOBBO'), 8000);
-
-        // setTimeout(() => this._d3.resetSelection(), 10000);
+        if (this.props.selectedValue !== prevProps.selectedValue) {
+            if (this.props.selectedValue === '') {
+                return this._d3.resetSelection()
+            }
+            this._d3.updateSelection(this.props.selectedValue)
+        }
     }
 
     render() {
-        const { isPending } = this.props;
+        const { selectedValue } = this.props;
 
         return (
             <div
-                className={cx('container', { isPending: isPending })}
+                className="container"
                 style={{
                     width: this.props.width,
                     height: this.props.height
@@ -70,7 +71,17 @@ class GeoHierarchy extends Component {
                 ref={node => {
                     this._root = select(node);
                 }}
-            />
+            >
+                <div className="toolbar">
+                    <button onClick={() => this._d3.zoomIn()}>+</button>
+                    <button onClick={() => this._d3.resetZoom()}>O</button>
+                    <button onClick={() => this._d3.zoomOut()}>-</button>
+                    <br></br>
+                    <button disabled={selectedValue === ''} onClick={() => this._d3.resetSelection()}>reset</button>
+                    <br></br>
+                    <button onClick={() => this._d3.reload()}>reload</button>
+                </div>
+            </div>
         );
     }
 }

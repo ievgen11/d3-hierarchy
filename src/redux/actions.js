@@ -7,6 +7,19 @@ export const getData = () => dispatch =>
         payload: DBService.getData()
     });
 
+export const setSelectedValue = value => dispatch =>
+    dispatch({
+        type: actionTypes.SET_SELECTED_VALUE,
+        payload: value
+    });
+
+export const resetSelectedValue = () => dispatch =>
+    dispatch({
+        type: actionTypes.RESET_SELECTED_VALUE
+    });
+
 export default {
-    getData
+    getData,
+    setSelectedValue,
+    resetSelectedValue
 };

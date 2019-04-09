@@ -8,40 +8,11 @@
     box-shadow: inset 0px 0px 107px -79px rgba(0,0,0,0.75);
 }
 
-.isPending {
-    position: relative;
-}
-
-.isPending::before {
+.toolbar {
     position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    content: '';
+    bottom: 0;
+    right: 0;
     z-index: 1;
-}
-
-.isPending::after {
-    height: 0;
-    width: 0;
-    padding: 15px;
-    border: 6px solid #c3c3c3;
-    border-right-color: #3b90e3;
-    border-radius: 22px;
-    -webkit-animation: rotate 1s infinite linear;
-    /* left, top and position just for the demo! */
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    content: '';
-    z-index: 2;
-}
-
-@-webkit-keyframes rotate {
-    /* 100% keyframe for  clockwise. 
-       use 0% instead for anticlockwise */
-    100% {
-        -webkit-transform: rotate(360deg);
-    }
+    display: flex;
+    flex-direction: column;
 }

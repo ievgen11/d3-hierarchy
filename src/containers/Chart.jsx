@@ -10,6 +10,7 @@ import GeoHierarchy from '../components/GeoHierarchy';
 class Chart extends Component {
     static propTypes = {
         data: PropTypes.object,
+        selectedValue: PropTypes.string,
         isError: PropTypes.bool.isRequired,
         isPending: PropTypes.bool.isRequired,
         getDataAction: PropTypes.func.isRequired
@@ -22,14 +23,20 @@ class Chart extends Component {
     }
 
     render() {
-        const { data, isPending, isError } = this.props;
+        const { data, isPending, isError, selectedValue } = this.props;
 
-        return <GeoHierarchy data={data} isPending={isPending} isError={isError} />;
+        return <GeoHierarchy
+            data={data}
+            isPending={isPending}
+            isError={isError}
+            selectedValue={selectedValue}
+        />;
     }
 }
 
 const mapStateToProps = state => ({
     data: selectors.getData(state),
+    selectedValue: selectors.getSelectedValue(state),
     isError: selectors.getDataIsError(state),
     isPending: selectors.getDataIsPending(state)
 });

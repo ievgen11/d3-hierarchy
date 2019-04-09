@@ -1,5 +1,5 @@
 import { tree, hierarchy } from 'd3-hierarchy';
-import { zoom, zoomIdentity } from 'd3-zoom';
+import { zoom, zoomIdentity, zoomTransform } from 'd3-zoom';
 import { event, select } from 'd3-selection';
 import 'd3-transition';
 
@@ -23,11 +23,12 @@ function diagonal(s, d) {
 }
 
 class _d3 {
-    constructor({ root, width, height, nodeSize, nodeDistance }) {
+    constructor({ root, width, height, nodeSize, nodeDistance, scaleStep }) {
         this.width = width;
         this.height = height;
         this.nodeSize = nodeSize;
         this.nodeDistance = nodeDistance;
+        this.scaleStep = scaleStep;
 
         this.tree = tree().nodeSize(nodeSize);
         this.data = hierarchy({});
@@ -64,8 +65,39 @@ class _d3 {
         this.selected = null;
 
         this._unselectNodes();
+
+        this._updateD3(this.data);
+    }
+
+    reload() {
+        this.selected = null;
+
+        this._unselectNodes();
+
+        if (this.data.children) {
+            this.data.children.forEach(child =>
+                this._collapseDescendants(child)
+            );
+        }
+
         this._zoomToPosition(this.nodeDistance / 2, 0, 1);
         this._updateD3(this.data);
+    }
+
+    resetZoom() {
+        this._zoomToPosition(this.nodeDistance / 2, 0, 1);
+    }
+
+    zoomIn() {
+        const { k: scale } = zoomTransform(this.svg.node());
+
+        this.zoom.scaleTo(this.svg, scale + this.scaleStep);
+    }
+
+    zoomOut() {
+        const { k: scale } = zoomTransform(this.svg.node());
+
+        this.zoom.scaleTo(this.svg, scale - this.scaleStep);
     }
 
     _expandSelected(nodes) {
