@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { select } from 'd3-selection';
+import { Map } from 'immutable';
 
 import _d3 from './d3';
 
@@ -33,14 +34,31 @@ class GeoHierarchy extends Component {
             root: this._root,
             width: width,
             height: height,
-            nodeSize: [60, 60],
-            nodeDistance: 200,
-            scaleStep: 0.25
+            svgClass: 'geo-hierarchy',
+            uniqueIdKey: 'location',
+            onNodeClick: node => {
+                if (node.data.type === 'Port') {
+                    window
+                        .open(`http://locode.info/${node.data.location}`, '_blank')
+                        .focus();
+                    return;
+                }
+            },
+            formatLabelText: node => {
+                if (node.data.type === 'Port') {
+                    return `${node.data.name} (${node.data.location})`;
+                }
+                return node.data.name;
+            }
         });
     }
 
     componentDidUpdate(prevProps) {
         const { data } = this.props;
+
+        if (!Map.isMap(data)) {
+            return;
+        }
 
         if (data.get('children').size <= 0) {
             return;

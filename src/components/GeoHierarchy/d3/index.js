@@ -10,7 +10,18 @@ import {
     CHILD_COLOR,
     LINK_COLOR,
     SELECTED_COLOR,
-    HOVER_COLOR
+    HOVER_COLOR,
+    DEFAULT_CHILDREN_KEY,
+    DEFAULT_FORMAT_LABEL_TEXT,
+    DEFAULT_HEIGHT,
+    DEFAULT_NDDE_SIZE,
+    DEFAULT_NODE_DISTANCE,
+    DEFAULT_ON_NODE_CLICK,
+    DEFAULT_SCALE_EXTENT,
+    DEFAULT_SCALE_STEP,
+    DEFAULT_UNIQUE_ID_KEY,
+    DEFAULT_WIDTH,
+    DEFAULT_SVG_CLASS
 } from './constants';
 
 import './styles.css';
@@ -23,12 +34,31 @@ function diagonal(s, d) {
 }
 
 class _d3 {
-    constructor({ root, width, height, nodeSize, nodeDistance, scaleStep }) {
+    constructor({
+        root,
+        width = DEFAULT_WIDTH,
+        height = DEFAULT_HEIGHT,
+        nodeSize = DEFAULT_NDDE_SIZE,
+        nodeDistance = DEFAULT_NODE_DISTANCE,
+        scaleStep = DEFAULT_SCALE_STEP,
+        scaleExtent = DEFAULT_SCALE_EXTENT,
+        childrenKey = DEFAULT_CHILDREN_KEY,
+        uniqueIdKey = DEFAULT_UNIQUE_ID_KEY,
+        onNodeClick = DEFAULT_ON_NODE_CLICK,
+        formatLabelText = DEFAULT_FORMAT_LABEL_TEXT,
+        svgClass = DEFAULT_SVG_CLASS
+    }) {
         this.width = width;
         this.height = height;
         this.nodeSize = nodeSize;
         this.nodeDistance = nodeDistance;
         this.scaleStep = scaleStep;
+        this.scaleExtent = scaleExtent;
+        this.childrenKey = childrenKey;
+        this.uniqueIdKey = uniqueIdKey;
+        this.onNodeClick = onNodeClick;
+        this.formatLabelText = formatLabelText;
+        this.svgClass = svgClass;
 
         this.tree = tree().nodeSize(nodeSize);
         this.data = hierarchy({});
@@ -38,10 +68,10 @@ class _d3 {
     }
 
     updateData(data) {
-        this.data = hierarchy(data, d => d.children);
+        this.data = hierarchy(data, this.childrenKeySelector);
 
-        if (this.data.children) {
-            this.data.children.forEach(child =>
+        if (this.data[this.childrenKey]) {
+            this.data[this.childrenKey].forEach(child =>
                 this._collapseDescendants(child)
             );
         }
@@ -74,8 +104,8 @@ class _d3 {
 
         this._unselectNodes();
 
-        if (this.data.children) {
-            this.data.children.forEach(child =>
+        if (this.data[this.childrenKey]) {
+            this.data[this.childrenKey].forEach(child =>
                 this._collapseDescendants(child)
             );
         }
@@ -98,6 +128,10 @@ class _d3 {
         const { k: scale } = zoomTransform(this.svg.node());
 
         this.zoom.scaleTo(this.svg, scale - this.scaleStep);
+    }
+
+    _childrenKeySelector(d) {
+        return d[this.childrenKey];
     }
 
     _expandSelected(nodes) {
@@ -165,13 +199,15 @@ class _d3 {
     }
 
     _searchTree(node, searchString, pathArray) {
-        if (node.data.location === searchString) {
+        if (node.data[this.uniqueIdKey] === searchString) {
             pathArray.push(node);
 
             return pathArray;
         }
 
-        const children = node.children ? node.children : node._children;
+        const children = node[this.childrenKey]
+            ? node[this.childrenKey]
+            : node[`_${this.childrenKey}`];
 
         if (!children) {
             return false;
@@ -191,33 +227,30 @@ class _d3 {
     }
 
     _collapseDescendants(d) {
-        if (d.children) {
-            d._children = d.children;
-            d._children.forEach(child => this._collapseDescendants(child));
-            d.children = null;
+        if (this._childrenKeySelector(d)) {
+            d[`_${this.childrenKey}`] = this._childrenKeySelector(d);
+            d[`_${this.childrenKey}`].forEach(child =>
+                this._collapseDescendants(child)
+            );
+            d[this.childrenKey] = null;
         }
 
         return d;
     }
 
     _expandChildren(d) {
-        if (d.children === null) {
-            d.children = d._children;
-            d._children = null;
+        if (this._childrenKeySelector(d) === null) {
+            d[this.childrenKey] = d[`_${this.childrenKey}`];
+            d[`_${this.childrenKey}`] = null;
         }
 
         return d;
     }
 
     _handleClick(d) {
-        if (d.data.type === 'Port') {
-            window
-                .open(`http://locode.info/${d.data.location}`, '_blank')
-                .focus();
-            return;
-        }
+        this.onNodeClick(d);
 
-        if (d.children) {
+        if (this._childrenKeySelector(d)) {
             this._collapseDescendants(d);
         } else {
             this._expandChildren(d);
@@ -285,12 +318,7 @@ class _d3 {
             .attr('x', 0)
             .style('fill', '#10183a')
             .attr('text-anchor', () => 'middle')
-            .text(d => {
-                if (d.data.type === 'Port') {
-                    return `${d.data.name} (${d.data.location})`;
-                }
-                return d.data.name;
-            });
+            .text(this.formatLabelText);
     }
 
     _formatOverlay(node) {
@@ -353,7 +381,7 @@ class _d3 {
         var node = this.svg
             .select('.container')
             .selectAll('.node')
-            .data(data, d => d.data.location);
+            .data(data, d => d.data[this.uniqueIdKey]);
 
         var nodeEnter = node
             .enter()
@@ -427,11 +455,10 @@ class _d3 {
     }
 
     _generateLinks(target, data) {
-        // Existing
         var link = this.svg
             .select('.container')
             .selectAll('.link')
-            .data(data, d => d.data.location);
+            .data(data, d => d.data[this.uniqueIdKey]);
 
         var linkEnter = link
             .enter()
@@ -510,12 +537,12 @@ class _d3 {
     }
 
     _init(root) {
-        this.svg = root.append('svg').style('pointer-events', 'all');
+        this.svg = root.append('svg').attr('class', this.svgClass).style('pointer-events', 'all');
 
         this.svg.append('g').attr('class', 'container');
 
         this.zoom = zoom()
-            .scaleExtent([0.5, 2])
+            .scaleExtent(this.scaleExtent)
             .on('zoom', () =>
                 this.svg.select('.container').attr('transform', event.transform)
             );
