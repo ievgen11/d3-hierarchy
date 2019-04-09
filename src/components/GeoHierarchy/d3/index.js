@@ -48,17 +48,19 @@ class _d3 {
         formatLabelText = DEFAULT_FORMAT_LABEL_TEXT,
         svgClass = DEFAULT_SVG_CLASS
     }) {
-        this.width = width;
-        this.height = height;
-        this.nodeSize = nodeSize;
-        this.nodeDistance = nodeDistance;
-        this.scaleStep = scaleStep;
-        this.scaleExtent = scaleExtent;
-        this.childrenKey = childrenKey;
-        this.uniqueIdKey = uniqueIdKey;
-        this.onNodeClick = onNodeClick;
-        this.formatLabelText = formatLabelText;
-        this.svgClass = svgClass;
+        this.config = {
+            width,
+            height,
+            nodeSize,
+            nodeDistance,
+            scaleStep,
+            scaleExtent,
+            childrenKey,
+            uniqueIdKey,
+            onNodeClick,
+            formatLabelText,
+            svgClass
+        };
 
         this.tree = tree().nodeSize(nodeSize);
         this.data = hierarchy({});
@@ -68,16 +70,16 @@ class _d3 {
     }
 
     updateData(data) {
-        this.data = hierarchy(data, this.childrenKeySelector);
+        this.data = hierarchy(data, this._getConfig('childrenKeySelector'));
 
-        if (this.data[this.childrenKey]) {
-            this.data[this.childrenKey].forEach(child =>
+        if (this.data[this._getConfig('childrenKey')]) {
+            this.data[this._getConfig('childrenKey')].forEach(child =>
                 this._collapseDescendants(child)
             );
         }
 
         this._updateD3(this.data);
-        this._zoomToPosition(this.nodeDistance / 2, 0, 1);
+        this._zoomToPosition(this._getConfig('nodeDistance') / 2, 0, 1);
     }
 
     updateSelection(selected) {
@@ -104,34 +106,38 @@ class _d3 {
 
         this._unselectNodes();
 
-        if (this.data[this.childrenKey]) {
-            this.data[this.childrenKey].forEach(child =>
+        if (this.data[this._getConfig('childrenKey')]) {
+            this.data[this._getConfig('childrenKey')].forEach(child =>
                 this._collapseDescendants(child)
             );
         }
 
-        this._zoomToPosition(this.nodeDistance / 2, 0, 1);
+        this._zoomToPosition(this._getConfig('nodeDistance') / 2, 0, 1);
         this._updateD3(this.data);
     }
 
     resetZoom() {
-        this._zoomToPosition(this.nodeDistance / 2, 0, 1);
+        this._zoomToPosition(this._getConfig('nodeDistance') / 2, 0, 1);
     }
 
     zoomIn() {
         const { k: scale } = zoomTransform(this.svg.node());
 
-        this.zoom.scaleTo(this.svg, scale + this.scaleStep);
+        this.zoom.scaleTo(this.svg, scale + this._getConfig('scaleStep'));
     }
 
     zoomOut() {
         const { k: scale } = zoomTransform(this.svg.node());
 
-        this.zoom.scaleTo(this.svg, scale - this.scaleStep);
+        this.zoom.scaleTo(this.svg, scale - this._getConfig('scaleStep'));
+    }
+
+    _getConfig(value) {
+        return this.config[value];
     }
 
     _childrenKeySelector(d) {
-        return d[this.childrenKey];
+        return d[this._getConfig('childrenKey')];
     }
 
     _expandSelected(nodes) {
@@ -199,15 +205,15 @@ class _d3 {
     }
 
     _searchTree(node, searchString, pathArray) {
-        if (node.data[this.uniqueIdKey] === searchString) {
+        if (node.data[this._getConfig('uniqueIdKey')] === searchString) {
             pathArray.push(node);
 
             return pathArray;
         }
 
-        const children = node[this.childrenKey]
-            ? node[this.childrenKey]
-            : node[`_${this.childrenKey}`];
+        const children = node[this._getConfig('childrenKey')]
+            ? node[this._getConfig('childrenKey')]
+            : node[`_${this._getConfig('childrenKey')}`];
 
         if (!children) {
             return false;
@@ -228,11 +234,13 @@ class _d3 {
 
     _collapseDescendants(d) {
         if (this._childrenKeySelector(d)) {
-            d[`_${this.childrenKey}`] = this._childrenKeySelector(d);
-            d[`_${this.childrenKey}`].forEach(child =>
+            d[`_${this._getConfig('childrenKey')}`] = this._childrenKeySelector(
+                d
+            );
+            d[`_${this._getConfig('childrenKey')}`].forEach(child =>
                 this._collapseDescendants(child)
             );
-            d[this.childrenKey] = null;
+            d[this._getConfig('childrenKey')] = null;
         }
 
         return d;
@@ -240,15 +248,16 @@ class _d3 {
 
     _expandChildren(d) {
         if (this._childrenKeySelector(d) === null) {
-            d[this.childrenKey] = d[`_${this.childrenKey}`];
-            d[`_${this.childrenKey}`] = null;
+            d[this._getConfig('childrenKey')] =
+                d[`_${this._getConfig('childrenKey')}`];
+            d[`_${this._getConfig('childrenKey')}`] = null;
         }
 
         return d;
     }
 
     _handleClick(d) {
-        this.onNodeClick(d);
+        this._getConfig('onNodeClick')(d);
 
         if (this._childrenKeySelector(d)) {
             this._collapseDescendants(d);
@@ -318,7 +327,7 @@ class _d3 {
             .attr('x', 0)
             .style('fill', '#10183a')
             .attr('text-anchor', () => 'middle')
-            .text(this.formatLabelText);
+            .text(this._getConfig('formatLabelText'));
     }
 
     _formatOverlay(node) {
@@ -381,7 +390,7 @@ class _d3 {
         var node = this.svg
             .select('.container')
             .selectAll('.node')
-            .data(data, d => d.data[this.uniqueIdKey]);
+            .data(data, d => d.data[this._getConfig('uniqueIdKey')]);
 
         var nodeEnter = node
             .enter()
@@ -458,7 +467,7 @@ class _d3 {
         var link = this.svg
             .select('.container')
             .selectAll('.link')
-            .data(data, d => d.data[this.uniqueIdKey]);
+            .data(data, d => d.data[this._getConfig('uniqueIdKey')]);
 
         var linkEnter = link
             .enter()
@@ -509,7 +518,7 @@ class _d3 {
         var data = this.tree(this.data)
             .descendants()
             .map(d => {
-                d.y = d.depth * this.nodeDistance;
+                d.y = d.depth * this._getConfig('nodeDistance');
                 d.x0 = d.x;
                 d.y0 = d.y;
 
@@ -529,20 +538,23 @@ class _d3 {
                 this.zoom.transform,
                 zoomIdentity
                     .translate(
-                        -y * scale + this.width / 2,
-                        -x * scale + this.height / 2
+                        -y * scale + this._getConfig('width') / 2,
+                        -x * scale + this._getConfig('height') / 2
                     )
                     .scale(scale)
             );
     }
 
     _init(root) {
-        this.svg = root.append('svg').attr('class', this.svgClass).style('pointer-events', 'all');
+        this.svg = root
+            .append('svg')
+            .attr('class', this._getConfig('svgClass'))
+            .style('pointer-events', 'all');
 
         this.svg.append('g').attr('class', 'container');
 
         this.zoom = zoom()
-            .scaleExtent(this.scaleExtent)
+            .scaleExtent(this._getConfig('scaleExtent'))
             .on('zoom', () =>
                 this.svg.select('.container').attr('transform', event.transform)
             );

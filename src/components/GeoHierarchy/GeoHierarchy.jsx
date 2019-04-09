@@ -17,7 +17,7 @@ class GeoHierarchy extends Component {
 
     static defaultProps = {
         width: 1280,
-        height: 800
+        height: 500
     };
 
     constructor(props) {
