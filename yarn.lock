@@ -911,18 +911,6 @@
   dependencies:
     tslib "^1.9.3"
 
-"@material/button@^1.0.0":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@material/button/-/button-1.1.1.tgz#35af0d295f6ce6e3df9d4978485b5294d794f682"
-  dependencies:
-    "@material/elevation" "^1.1.0"
-    "@material/feature-targeting" "^0.44.1"
-    "@material/ripple" "^1.1.0"
-    "@material/rtl" "^0.42.0"
-    "@material/shape" "^1.1.1"
-    "@material/theme" "^1.1.0"
-    "@material/typography" "^1.0.0"
-
 "@material/dom@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@material/dom/-/dom-1.1.0.tgz#3bd3d1a3415b4181118fecb182d93beda56a6f8c"
@@ -936,6 +924,19 @@
     "@material/animation" "^1.0.0"
     "@material/feature-targeting" "^0.44.1"
     "@material/theme" "^1.1.0"
+
+"@material/fab@^1.0.0":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@material/fab/-/fab-1.1.1.tgz#1c8cb818b76ed30d6abb2f667c7df359300fec0d"
+  dependencies:
+    "@material/animation" "^1.0.0"
+    "@material/elevation" "^1.1.0"
+    "@material/feature-targeting" "^0.44.1"
+    "@material/ripple" "^1.1.0"
+    "@material/rtl" "^0.42.0"
+    "@material/shape" "^1.1.1"
+    "@material/theme" "^1.1.0"
+    "@material/typography" "^1.0.0"
 
 "@material/feature-targeting@^0.44.1":
   version "0.44.1"
@@ -999,34 +1000,41 @@
     hyperform "^0.9.9"
     mutation-observer "^1.0.3"
 
-"@rmwc/base@^5.2.2":
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/@rmwc/base/-/base-5.2.2.tgz#389a22c634fe9d0336d300673fa78e2e9518c4bf"
+"@rmwc/base@^5.3.1":
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/@rmwc/base/-/base-5.3.1.tgz#9a7393fbb1279a129692db022a075ae9f69c95ef"
   dependencies:
-    "@rmwc/types" "^5.2.1"
+    "@rmwc/types" "^5.3.1"
     classnames "^2.2.6"
     focus-trap "^4.0.2"
     hyperform "^0.9.9"
     mutation-observer "^1.0.3"
 
-"@rmwc/button@^5.2.2":
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/@rmwc/button/-/button-5.2.2.tgz#ed6e3f2f56dc9c0fa60244e1fe7036d550ff9af0"
+"@rmwc/circular-progress@^5.3.1":
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/@rmwc/circular-progress/-/circular-progress-5.3.1.tgz#81a6d768b8f0bcf7584e80e7f33c54105c9f5b10"
   dependencies:
-    "@material/button" "^1.0.0"
-    "@rmwc/base" "^5.2.2"
-    "@rmwc/icon" "^5.2.2"
-    "@rmwc/provider" "^5.2.2"
-    "@rmwc/ripple" "^5.2.2"
-    "@rmwc/types" "^5.2.1"
+    "@rmwc/base" "^5.3.1"
+    "@rmwc/types" "^5.3.1"
 
-"@rmwc/icon@^5.2.2":
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/@rmwc/icon/-/icon-5.2.2.tgz#12b9317a3042852df23ce3708cf4ae5a2523dd3e"
+"@rmwc/fab@^5.3.1":
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/@rmwc/fab/-/fab-5.3.1.tgz#c33704136e7a7aff1b673ad5a1f4deda9724a240"
   dependencies:
-    "@rmwc/base" "^5.2.2"
-    "@rmwc/provider" "^5.2.2"
-    "@rmwc/types" "^5.2.1"
+    "@material/fab" "^1.0.0"
+    "@rmwc/base" "^5.3.1"
+    "@rmwc/icon" "^5.3.1"
+    "@rmwc/provider" "^5.3.1"
+    "@rmwc/ripple" "^5.3.1"
+    "@rmwc/types" "^5.3.1"
+
+"@rmwc/icon@^5.3.1":
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/@rmwc/icon/-/icon-5.3.1.tgz#077f70ffca8c0ed09a8aacbfcd511a3ebbe03745"
+  dependencies:
+    "@rmwc/base" "^5.3.1"
+    "@rmwc/provider" "^5.3.1"
+    "@rmwc/types" "^5.3.1"
 
 "@rmwc/provider@^5.2.1":
   version "5.2.1"
@@ -1035,33 +1043,37 @@
     "@rmwc/base" "^5.2.1"
     "@rmwc/types" "^5.2.1"
 
-"@rmwc/provider@^5.2.2":
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/@rmwc/provider/-/provider-5.2.2.tgz#bf43317131766730c09c70dbfca10488a8fc0be3"
+"@rmwc/provider@^5.3.1":
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/@rmwc/provider/-/provider-5.3.1.tgz#f7b30c11c08d09878ce9d5458b05a2407a39efb0"
   dependencies:
-    "@rmwc/base" "^5.2.2"
-    "@rmwc/types" "^5.2.1"
+    "@rmwc/base" "^5.3.1"
+    "@rmwc/types" "^5.3.1"
 
-"@rmwc/ripple@^5.2.2":
-  version "5.2.2"
-  resolved "https://registry.yarnpkg.com/@rmwc/ripple/-/ripple-5.2.2.tgz#c5402db694e25287a197785580aa0aefade42e07"
+"@rmwc/ripple@^5.3.1":
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/@rmwc/ripple/-/ripple-5.3.1.tgz#8af0ffb93def045f265f1b7c87e2e5374896869b"
   dependencies:
     "@material/ripple" "^1.0.0"
-    "@rmwc/base" "^5.2.2"
-    "@rmwc/provider" "^5.2.2"
-    "@rmwc/types" "^5.2.1"
+    "@rmwc/base" "^5.3.1"
+    "@rmwc/provider" "^5.3.1"
+    "@rmwc/types" "^5.3.1"
 
-"@rmwc/theme@^5.2.1":
-  version "5.2.1"
-  resolved "https://registry.yarnpkg.com/@rmwc/theme/-/theme-5.2.1.tgz#0011f0c04000b2c6e0e619f669be85ea5961878e"
+"@rmwc/theme@^5.3.1":
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/@rmwc/theme/-/theme-5.3.1.tgz#7a370ba1ea805fa641f61bd30ecacbc2a864c7fa"
   dependencies:
     "@material/theme" "^0.43.0"
-    "@rmwc/base" "^5.2.1"
-    "@rmwc/types" "^5.2.1"
+    "@rmwc/base" "^5.3.1"
+    "@rmwc/types" "^5.3.1"
 
 "@rmwc/types@^5.2.1":
   version "5.2.1"
   resolved "https://registry.yarnpkg.com/@rmwc/types/-/types-5.2.1.tgz#5b9ab207cc40421b5085a07f3389423589c811f9"
+
+"@rmwc/types@^5.3.1":
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/@rmwc/types/-/types-5.3.1.tgz#5dcc1fed0e37cc5349c4bd3e3655c7d634328544"
 
 "@svgr/babel-plugin-add-jsx-attribute@^4.0.0":
   version "4.0.0"

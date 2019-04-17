@@ -21,8 +21,9 @@ ReactDOM.render(
     <RMWCProvider>
         <ThemeProvider
             options={{
-                primary: 'red',
-                secondary: 'blue'
+                primary: '#fe4a49',
+                secondary: 'rgba(255, 255, 255, 1)',
+                onSecondary: '#000'
             }}
         >
             <Provider store={store}>

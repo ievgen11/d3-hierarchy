@@ -24,15 +24,43 @@ class Chart extends Component {
     }
 
     render() {
-        const { data, isPending, isError, selectedValue, resetSelectedValue } = this.props;
+        const {
+            data,
+            isPending,
+            isError,
+            selectedValue,
+            resetSelectedValue
+        } = this.props;
 
-        return <GeoHierarchy
-            data={data}
-            isPending={isPending}
-            isError={isError}
-            selectedValue={selectedValue}
-            onSelectionClear={() => resetSelectedValue()}
-        />;
+        return (
+            <GeoHierarchy
+                data={data}
+                minWidth={800}
+                minHeight={600}
+                leafType="Port"
+                onNodeClick={node => {
+                    if (node.data.type === 'Port') {
+                        window
+                            .open(
+                                `http://locode.info/${node.data.location}`,
+                                '_blank'
+                            )
+                            .focus();
+                        return;
+                    }
+                }}
+                formatLabelText={node => {
+                    if (node.data.type === 'Port') {
+                        return `${node.data.name} (${node.data.location})`;
+                    }
+                    return node.data.name;
+                }}
+                isPending={isPending}
+                isError={isError}
+                selectedValue={selectedValue}
+                onSelectionClear={() => resetSelectedValue()}
+            />
+        );
     }
 }
 
