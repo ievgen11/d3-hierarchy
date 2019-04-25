@@ -18,12 +18,12 @@ export const DEFAULT_REGION_LEVELS = [0, 1, 2, 3, 4, 5, 6];
 export const DEFAULT_MAX_REGION_LEVEL = 6;
 
 // COLORS
-export const ROOT_COLOR = '#fe4a49';
-export const NODE_COLOR = '#2ab7ca';
-export const LEAF_COLOR = '#fed766';
+export const ROOT_COLOR = '#EFC958';
+export const NODE_COLOR = '#E17A47';
+export const LEAF_COLOR = '#EF3D59';
 export const LINK_COLOR = '#e6e6ea';
-export const SELECTED_COLOR = '#2ab7ca';
-export const HOVER_COLOR = '#fe4a49';
+export const SELECTED_COLOR = '#05c46b';
+export const HOVER_COLOR = '#4AB19D';
 
 // MISC
 export const TRANSITION_DURATION = 400;

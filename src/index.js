@@ -12,8 +12,11 @@ import {
     Redirect
 } from 'react-router-dom';
 
-import Dashboard from './pages/Dashboard';
-import App from './containers/App';
+import Hierarchy from './containers/Hierarchy';
+
+import '@rmwc/icon/icon.css';
+import '@rmwc/circular-progress/circular-progress.css';
+import '@material/fab/dist/mdc.fab.css';
 
 import './styles/app.css';
 
@@ -28,16 +31,14 @@ ReactDOM.render(
         >
             <Provider store={store}>
                 <Router>
-                    <App>
-                        <Switch>
-                            <Route
-                                exact
-                                path="/dashboard"
-                                component={Dashboard}
-                            />
-                            <Redirect to="/dashboard" />
-                        </Switch>
-                    </App>
+                    <Switch>
+                        <Route
+                            exact
+                            path="/hierarchy"
+                            component={Hierarchy}
+                        />
+                        <Redirect to="/hierarchy" />
+                    </Switch>
                 </Router>
             </Provider>
         </ThemeProvider>

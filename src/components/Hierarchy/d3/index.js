@@ -44,7 +44,7 @@ class _d3 {
         scaleExtent = DEFAULT_SCALE_EXTENT,
         childrenKey = DEFAULT_CHILDREN_KEY,
         uniqueIdKey = DEFAULT_UNIQUE_ID_KEY,
-        onNodeClick = DEFAULT_ON_NODE_CLICK,
+        onLeafClick = DEFAULT_ON_NODE_CLICK,
         formatLabelText = DEFAULT_FORMAT_LABEL_TEXT,
         svgClass = DEFAULT_SVG_CLASS,
         onSelectionClear = DEFAULT_ON_SELECTION_CLEAR,
@@ -59,7 +59,7 @@ class _d3 {
             scaleExtent,
             childrenKey,
             uniqueIdKey,
-            onNodeClick,
+            onLeafClick,
             formatLabelText,
             svgClass,
             onSelectionClear,
@@ -294,7 +294,10 @@ class _d3 {
     }
 
     _handleClick(d) {
-        this._getConfig('onNodeClick')(d);
+
+        if (d.data[this._getConfig('childTypeKey')] === this._getConfig('leafType')) {
+            this._getConfig('onLeafClick')(d);
+        }
 
         if (this._childrenKeySelector(d)) {
             this.resetSelection();
@@ -390,6 +393,8 @@ class _d3 {
     }
 
     _handleMouseOver(d) {
+        select(d).raise();
+
         this._formatLink(
             this.svg
                 .selectAll('path')
@@ -422,7 +427,9 @@ class _d3 {
         );
     }
 
-    _handleMouseLeave() {
+    _handleMouseLeave(d) {
+        select(d).lower();
+
         this._formatLink(
             this.svg
                 .selectAll('path')

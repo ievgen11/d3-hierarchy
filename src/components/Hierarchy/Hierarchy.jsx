@@ -5,19 +5,15 @@ import { Map } from 'immutable';
 
 import { select } from 'd3-selection';
 
-import { ThemeProvider } from '@rmwc/theme';
 import { Icon } from '@rmwc/icon';
 import { Fab } from '@rmwc/fab';
 import { CircularProgress } from '@rmwc/circular-progress';
 
-import '@rmwc/icon/icon.css';
-import '@rmwc/circular-progress/circular-progress.css';
-import '@material/fab/dist/mdc.fab.css';
-
 import _d3 from './d3';
-import styles from './styles.css';
 
-class GeoHierarchy extends Component {
+import './styles/styles.css';
+
+class Hierarchy extends Component {
   static propTypes = {
     data: PropTypes.object,
     isPending: PropTypes.bool,
@@ -30,7 +26,7 @@ class GeoHierarchy extends Component {
     uniqueIdKey: PropTypes.string,
     childTypeKey: PropTypes.string,
     leafType: PropTypes.string.isRequired,
-    onNodeClick: PropTypes.func.isRequired,
+    onLeafClick: PropTypes.func.isRequired,
     formatLabelText: PropTypes.func.isRequired,
   };
 
@@ -62,7 +58,7 @@ class GeoHierarchy extends Component {
       uniqueIdKey,
       childTypeKey,
       leafType,
-      onNodeClick,
+      onLeafClick,
       formatLabelText,
     } = this.props;
 
@@ -73,7 +69,7 @@ class GeoHierarchy extends Component {
       uniqueIdKey: uniqueIdKey,
       childTypeKey: childTypeKey,
       leafType: leafType,
-      onNodeClick: onNodeClick,
+      onLeafClick: onLeafClick,
       onSelectionClear: onSelectionClear,
       formatLabelText: formatLabelText,
     });
@@ -109,7 +105,6 @@ class GeoHierarchy extends Component {
 
   render() {
     const {
-      selectedValue,
       toolbarContent,
       minWidth,
       minHeight,
@@ -187,4 +182,4 @@ class GeoHierarchy extends Component {
   }
 }
 
-export default GeoHierarchy;
+export default Hierarchy;

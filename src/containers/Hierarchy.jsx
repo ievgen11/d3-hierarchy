@@ -5,9 +5,9 @@ import { connect } from 'react-redux';
 import actions from '../redux/actions';
 import selectors from '../redux/selectors';
 
-import GeoHierarchy from '../components/GeoHierarchy';
+import HierarchyComponent from '../components/Hierarchy';
 
-class Chart extends Component {
+class Hierarchy extends Component {
     static propTypes = {
         data: PropTypes.object,
         selectedValue: PropTypes.string,
@@ -33,21 +33,19 @@ class Chart extends Component {
         } = this.props;
 
         return (
-            <GeoHierarchy
+            <HierarchyComponent
                 data={data}
                 minWidth={800}
                 minHeight={600}
                 leafType="Port"
-                onNodeClick={node => {
-                    if (node.data.type === 'Port') {
-                        window
-                            .open(
-                                `http://locode.info/${node.data.location}`,
-                                '_blank'
-                            )
-                            .focus();
-                        return;
-                    }
+                onLeafClick={node => {
+                    window
+                        .open(
+                            `http://locode.info/${node.data.location}`,
+                            '_blank'
+                        )
+                        .focus();
+                    return;
                 }}
                 formatLabelText={node => {
                     if (node.data.type === 'Port') {
@@ -76,11 +74,9 @@ const mapDispatchToProps = dispatch => ({
     resetSelectedValue: () => dispatch(actions.resetSelectedValue())
 });
 
-const ConnectedChart = withRouter(
+export default withRouter(
     connect(
         mapStateToProps,
         mapDispatchToProps
-    )(Chart)
+    )(Hierarchy)
 );
-
-export default ConnectedChart;
