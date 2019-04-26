@@ -26,4 +26,4 @@ export const SELECTED_COLOR = '#05c46b';
 export const HOVER_COLOR = '#4AB19D';
 
 // MISC
-export const TRANSITION_DURATION = 400;
+export const TRANSITION_DURATION = 250;

@@ -1,6 +1,7 @@
 import { hierarchy, tree } from 'd3-hierarchy';
 import { zoom, zoomIdentity, zoomTransform } from 'd3-zoom';
 import { event, select } from 'd3-selection';
+import { transform } from 'd3-transform';
 
 import 'd3-transition';
 
@@ -33,6 +34,24 @@ function elbow(s, d) {
     C ${(s.y + d.y) / 2} ${s.x},
       ${(s.y + d.y) / 2} ${d.x},
       ${d.y} ${d.x}`;
+}
+
+function getTranslation(transform) {
+    // Create a dummy g for calculation purposes only. This will never
+    // be appended to the DOM and will be discarded once this function
+    // returns.
+    var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+    // Set the transform attribute to the provided string value.
+    g.setAttributeNS(null, 'transform', transform);
+
+    // consolidate the SVGTransformList containing all transformations
+    // to a single SVGTransform of type SVG_TRANSFORM_MATRIX and get
+    // its SVGMatrix.
+    var matrix = g.transform.baseVal.consolidate().matrix;
+
+    // As per definition values e and f are the ones for the translation.
+    return [matrix.e, matrix.f];
 }
 
 class _d3 {
@@ -180,10 +199,7 @@ class _d3 {
                 .filter(function() {
                     return this.getAttribute('is-selected') === 'true';
                 })
-                .attr('is-selected', function() {
-                    select(this).lower();
-                    return null;
-                })
+                .attr('is-selected', null)
         );
         this._formatIndicator(
             this.svg
@@ -191,10 +207,7 @@ class _d3 {
                 .filter(function() {
                     return this.getAttribute('is-selected') === 'true';
                 })
-                .attr('is-selected', function() {
-                    select(this).lower();
-                    return null;
-                })
+                .attr('is-selected', null)
         );
     }
 
@@ -209,10 +222,7 @@ class _d3 {
                             .reverse()
                             .indexOf(node) >= 0
                 )
-                .attr('is-selected', function() {
-                    select(this).raise();
-                    return 'true';
-                })
+                .attr('is-selected', 'true')
         );
         this._formatIndicator(
             this.svg
@@ -224,10 +234,7 @@ class _d3 {
                             .reverse()
                             .indexOf(node) >= 0
                 )
-                .attr('is-selected', function() {
-                    select(this).raise();
-                    return 'true';
-                })
+                .attr('is-selected', 'true')
         );
     }
 
@@ -294,8 +301,10 @@ class _d3 {
     }
 
     _handleClick(d) {
-
-        if (d.data[this._getConfig('childTypeKey')] === this._getConfig('leafType')) {
+        if (
+            d.data[this._getConfig('childTypeKey')] ===
+            this._getConfig('leafType')
+        ) {
             this._getConfig('onLeafClick')(d);
         }
 
@@ -382,141 +391,16 @@ class _d3 {
             .text(this._getConfig('formatLabelText'));
     }
 
-    _formatOverlay(node) {
-        return node
-            .attr('x', -25)
-            .attr('y', -25)
-            .attr('height', 50)
-            .attr('width', 50)
-            .style('fill', 'none')
-            .style('pointer-events', 'all');
-    }
-
-    _handleMouseOver(d) {
-        select(d).raise();
-
-        this._formatLink(
-            this.svg
-                .selectAll('path')
-                .filter(
-                    node =>
-                        d
-                            .ancestors()
-                            .reverse()
-                            .indexOf(node) >= 0
-                )
-                .attr('is-hover', function() {
-                    select(this).raise();
-                    return 'true';
-                })
-        );
-        this._formatIndicator(
-            this.svg
-                .selectAll('.indicator')
-                .filter(
-                    node =>
-                        d
-                            .ancestors()
-                            .reverse()
-                            .indexOf(node) >= 0
-                )
-                .attr('is-hover', function() {
-                    select(this).raise();
-                    return 'true';
-                })
-        );
-    }
-
-    _handleMouseLeave(d) {
-        select(d).lower();
-
-        this._formatLink(
-            this.svg
-                .selectAll('path')
-                .filter(function() {
-                    return this.getAttribute('is-hover') === 'true';
-                })
-                .attr('is-hover', function() {
-                    select(this).lower();
-                    return null;
-                })
-        );
-        this._formatIndicator(
-            this.svg
-                .selectAll('.indicator')
-                .filter(function() {
-                    return this.getAttribute('is-hover') === 'true';
-                })
-                .attr('is-hover', function() {
-                    select(this).lower();
-                    return null;
-                })
-        );
-    }
-
-    _generateNodes(target, data) {
-        const node = this.svg
-            .select('.container')
-            .selectAll('.node')
-            .data(data, d => d.data[this._getConfig('uniqueIdKey')]);
-
-        const nodeEnter = node
-            .enter()
-            .append('g')
-            .attr('class', 'node')
-            .attr('cursor', 'pointer')
-            .attr('transform', () => `translate(${target.y0},${target.x0})`);
-
-        node.exit()
-            .style('opacity', 1)
-            .transition()
-            .duration(TRANSITION_DURATION)
-            .style('opacity', 0)
-            .attr('transform', () => `translate(${target.y},${target.x})`)
-            .remove();
-
-        this._formatIndicator(node.selectAll('.indicator'));
-        this._formatLabel(node.selectAll('.label'));
-        this._formatOverlay(node.selectAll('.overlay'));
-
-        this._formatIndicator(
-            nodeEnter
-                .append('circle')
-                .attr('class', 'indicator')
-                .style('opacity', 0)
-                .transition()
-                .duration(TRANSITION_DURATION)
-                .style('opacity', 1)
-        );
-
-        this._formatLabel(
-            nodeEnter
-                .append('text')
-                .attr('class', 'label')
-                .style('opacity', 0)
-                .transition()
-                .duration(TRANSITION_DURATION)
-                .style('opacity', 1)
-        );
-
-        this._formatOverlay(nodeEnter.append('rect').attr('class', 'overlay'));
-
-        const nodeUpdate = nodeEnter.merge(node);
-
-        nodeUpdate
-            .on('click', d => this._handleClick(d))
-            .on('mouseover', d => this._handleMouseOver(d))
-            .on('mouseleave', d => this._handleMouseLeave(d));
-
-        nodeUpdate
-            .transition()
-            .duration(TRANSITION_DURATION)
-            .attr('transform', d => `translate(${d.y},${d.x})`);
-    }
-
     _formatLink(node) {
         return node
             .attr('fill', 'none')
+            .attr('d', function(d) {
+                if (!d.parent) {
+                    return null;
+                }
+
+                return elbow(d.parent, d);
+            })
             .attr('stroke', function() {
                 if (this.getAttribute('is-selected') === 'true') {
                     return SELECTED_COLOR;
@@ -528,21 +412,143 @@ class _d3 {
 
                 return LINK_COLOR;
             })
+            .attr('transform', function(d) {
+                if (!d.parent) {
+                    return null;
+                }
+
+                return transform().translate(d => [d.y, d.x])({
+                    x: -getTranslation(
+                        select(this.parentNode).attr('transform')
+                    )[1],
+                    y: -getTranslation(
+                        select(this.parentNode).attr('transform')
+                    )[0]
+                });
+            })
             .attr('stroke-width', 2);
     }
 
-    _generateLinks(target, data) {
-        const link = this.svg
-            .select('.container')
-            .selectAll('.link')
-            .data(data, d => d.data[this._getConfig('uniqueIdKey')]);
+    _formatOverlay(node) {
+        return node
+            .attr('x', -25)
+            .attr('y', -25)
+            .attr('height', 50)
+            .attr('width', 50)
+            .style('fill', 'none')
+            .style('pointer-events', 'all');
+    }
 
-        const linkEnter = link
+    _handleMouseOver(d) {
+        this.svg
+            .selectAll('.node')
+            .filter(
+                node =>
+                    d
+                        .ancestors()
+                        .reverse()
+                        .indexOf(node) >= 0
+            )
+            .filter(function() {
+                select(this).raise();
+            });
+
+        this._formatLink(
+            this.svg
+                .selectAll('.link')
+                .filter(
+                    node =>
+                        d
+                            .ancestors()
+                            .reverse()
+                            .indexOf(node) >= 0
+                )
+                .attr('is-hover', 'true')
+                .transition()
+                .duration(TRANSITION_DURATION)
+        );
+        this._formatIndicator(
+            this.svg
+                .selectAll('.indicator')
+                .filter(
+                    node =>
+                        d
+                            .ancestors()
+                            .reverse()
+                            .indexOf(node) >= 0
+                )
+                .attr('is-hover', 'true')
+                .transition()
+                .duration(TRANSITION_DURATION)
+        );
+    }
+
+    _handleMouseLeave() {
+        this._formatLink(
+            this.svg
+                .selectAll('path')
+                .filter(function() {
+                    return this.getAttribute('is-hover') === 'true';
+                })
+                .attr('is-hover', null)
+                .transition()
+                .duration(TRANSITION_DURATION)
+        );
+        this._formatIndicator(
+            this.svg
+                .selectAll('.indicator')
+                .filter(function() {
+                    return this.getAttribute('is-hover') === 'true';
+                })
+                .attr('is-hover', null)
+                .transition()
+                .duration(TRANSITION_DURATION)
+        );
+    }
+
+    _generateExisting(node) {
+        this._formatLink(node.selectAll('.link'));
+        this._formatIndicator(node.selectAll('.indicator'));
+        this._formatLabel(node.selectAll('.label'));
+        this._formatOverlay(node.selectAll('.overlay'));
+    }
+
+    _generateEnter(node, target) {
+        const nodeEnter = node
             .enter()
-            .insert('path', 'g')
-            .attr('class', 'link');
+            .append('g')
+            .attr('class', 'node')
+            .attr('id', d => d.data[this._getConfig('uniqueIdKey')])
+            .attr('transform', d =>
+                transform().translate(d => [d.y, d.x])({
+                    x: target.x0,
+                    y: target.y0
+                })
+            )
+            .attr('cursor', 'pointer');
 
-        link.exit()
+        nodeEnter.call(d => d.lower());
+
+        nodeEnter
+            .style('opacity', 0)
+            .transition()
+            .duration(TRANSITION_DURATION)
+            .style('opacity', 1);
+
+        this._formatLink(nodeEnter.append('path', 'g').attr('class', 'link'));
+
+        this._formatIndicator(
+            nodeEnter.append('circle').attr('class', 'indicator')
+        );
+        this._formatLabel(nodeEnter.append('text').attr('class', 'label'));
+        this._formatOverlay(nodeEnter.append('rect').attr('class', 'overlay'));
+
+        return nodeEnter;
+    }
+
+    _generateExit(node, target) {
+        node.exit()
+            .selectAll('.link')
             .transition()
             .duration(TRANSITION_DURATION)
             .attr('d', () =>
@@ -551,34 +557,59 @@ class _d3 {
                     { x: target.x, y: target.y }
                 )
             )
-            .remove();
+            .attr('transform', d =>
+                transform().translate(d => [d.y, d.x])({
+                    x: -target.x,
+                    y: -target.y
+                })
+            );
 
-        this._formatLink(
-            link
-                .selectAll('.link')
-                .attr('d', () =>
-                    elbow(
-                        { x: target.x0, y: target.y0 },
-                        { x: target.x0, y: target.y0 }
-                    )
-                )
-        );
-
-        this._formatLink(
-            linkEnter.attr('d', () =>
-                elbow(
-                    { x: target.x0, y: target.y0 },
-                    { x: target.x0, y: target.y0 }
-                )
-            )
-        );
-
-        const linkUpdate = linkEnter.merge(link);
-
-        linkUpdate
+        node.exit()
+            .style('opacity', 1)
             .transition()
             .duration(TRANSITION_DURATION)
-            .attr('d', d => (d && d.parent ? elbow(d, d.parent) : null));
+            .style('opacity', 0)
+            .attr('transform', () =>
+                transform().translate(d => [d.y, d.x])({
+                    x: target.x,
+                    y: target.y
+                })
+            )
+            .remove();
+    }
+
+    _generateUpdate(node, enterNodes, target) {
+        const nodeUpdate = enterNodes.merge(node);
+
+        nodeUpdate
+            .on('click', d => this._handleClick(d))
+            .on('mouseover', d => this._handleMouseOver(d, target))
+            .on('mouseleave', d => this._handleMouseLeave(d, target));
+
+        nodeUpdate.attr('transform', d =>
+            transform().translate(d => [d.y, d.x])({
+                x: d.x,
+                y: d.y
+            })
+        );
+
+        this._formatLink(nodeUpdate.selectAll('.link'));
+    }
+
+    _generateNodes(target, data) {
+        const node = this.svg
+            .select('.container')
+            .selectAll('.node')
+            .data(data, d => d.data[this._getConfig('uniqueIdKey')]);
+
+        // Format existing stuff
+        this._generateExisting(node);
+
+        // Format exit stuff
+        this._generateExit(node, target);
+
+        // Format update stuff
+        this._generateUpdate(node, this._generateEnter(node, target), target);
     }
 
     _updateD3(target) {
@@ -595,7 +626,6 @@ class _d3 {
             });
 
         this._generateNodes(target, data);
-        this._generateLinks(target, data);
     }
 
     _zoomToPosition(y, x, scale) {
