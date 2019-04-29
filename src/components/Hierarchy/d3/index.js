@@ -26,7 +26,8 @@ import {
     DEFAULT_SVG_CLASS,
     DEFAULT_ON_SELECTION_CLEAR,
     DEFAULT_LEAF_TYPE,
-    DEFAULT_CHILD_TYPE_KEY
+    DEFAULT_CHILD_TYPE_KEY,
+    DEFAULT_LEAF_DASH_ARRAY_SIZE
 } from './constants';
 
 function elbow(s, d) {
@@ -69,6 +70,7 @@ class _d3 {
         onSelectionClear = DEFAULT_ON_SELECTION_CLEAR,
         leafType = DEFAULT_LEAF_TYPE,
         childTypeKey = DEFAULT_CHILD_TYPE_KEY,
+        leafDashArraySize = DEFAULT_LEAF_DASH_ARRAY_SIZE,
         selectedValue = null
     }) {
         this.config = {
@@ -83,7 +85,8 @@ class _d3 {
             svgClass,
             onSelectionClear,
             leafType,
-            childTypeKey
+            childTypeKey,
+            leafDashArraySize
         };
 
         this.tree = tree().nodeSize(nodeSize);
@@ -426,6 +429,9 @@ class _d3 {
                     )[0]
                 });
             })
+            .attr('stroke-dasharray', d =>
+                d.data[this._getConfig('childrenKey')].length > 0 ? null : this._getConfig('leafDashArraySize')
+            )
             .attr('stroke-width', 2);
     }
 
