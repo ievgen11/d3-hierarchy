@@ -405,19 +405,15 @@ class _d3 {
     updateData(data) {
         this.data = hierarchy(data, this._getConfig('childrenKeySelector'));
 
-        if (this.data[this._getConfig('childrenKey')]) {
-            this.data[this._getConfig('childrenKey')].forEach(child =>
-                this._collapseDescendants(child)
-            );
-        }
+        this._collapseDescendants(this.data);
 
-        this._updateD3();
-
-        this._zoomToPosition(this._getConfig('nodeDistance') / 2, 0, 1);
+        this._zoomToPosition(0, 0, 1);
 
         if (this.selected !== null) {
             this.setSelection(this.selected);
         }
+
+        this._updateD3();
     }
 
     setSelection(selected) {
@@ -451,7 +447,7 @@ class _d3 {
             );
         }
 
-        this._zoomToPosition(this._getConfig('nodeDistance') / 2, 0, 1);
+        this._zoomToPosition(0, 0, 1);
         this._updateD3();
     }
 
@@ -462,7 +458,7 @@ class _d3 {
             );
         }
 
-        this._zoomToPosition(this._getConfig('nodeDistance') / 2, 0, 1);
+        this._zoomToPosition(0, 0, 1);
     }
 
     zoomIn() {
