@@ -55,7 +55,7 @@ class Hierarchy extends Component {
                 }}
                 isPending={isPending}
                 isError={isError}
-                selectedValue={"EETLL"}
+                selectedValue={"RUARH"}
                 onSelectionClear={() => resetSelectedValue()}
             />
         );

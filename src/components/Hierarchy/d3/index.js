@@ -85,6 +85,316 @@ class _d3 {
         this._init(root);
     }
 
+    _handleOnItemClick(item) {
+        if (
+            item.data[this._getConfig('childTypeKey')] ===
+            this._getConfig('leafType')
+        ) {
+            this._getConfig('onLeafClick')(item);
+        }
+
+        if (this._childrenKeySelector(item)) {
+            this.resetSelection();
+            this._collapseDescendants(item);
+        } else {
+            this._expandChildren(item);
+        }
+
+        this._updateD3(item);
+    }
+
+    _handleOnItemMouseOver(item) {
+        this.svg
+            .selectAll('.item')
+            .filter(
+                node =>
+                    item
+                        .ancestors()
+                        .reverse()
+                        .indexOf(node) >= 0
+            )
+            .attr('is-hover', 'true')
+            .each(function() {
+                select(this).raise();
+            });
+
+        this._formatLinks(
+            this.svg
+                .selectAll('.link')
+                .transition()
+                .duration(TRANSITION_DURATION)
+        );
+        this._formatIndicators(
+            this.svg
+                .selectAll('.indicator')
+                .transition()
+                .duration(TRANSITION_DURATION)
+        );
+    }
+
+    _handleOnItemMouseLeave(item) {
+        this.svg
+            .selectAll('.item')
+            .filter(
+                node =>
+                    item
+                        .ancestors()
+                        .reverse()
+                        .indexOf(node) >= 0
+            )
+            .attr('is-hover', null);
+
+        this._formatLinks(
+            this.svg
+                .selectAll('.link')
+                .transition()
+                .duration(TRANSITION_DURATION)
+        );
+        this._formatIndicators(
+            this.svg
+                .selectAll('.indicator')
+                .transition()
+                .duration(TRANSITION_DURATION)
+        );
+    }
+
+    _generateItems(rootItem, data) {
+        const items = this.svg
+            .select('.container')
+            .selectAll('.item')
+            .data(data, d => d.data[this._getConfig('uniqueIdKey')]);
+
+        this._generateExistingItems(items);
+        this._generateExitItems(items, rootItem);
+        this._generateUpdateItems(
+            items,
+            this._generateEnterItems(items, rootItem)
+        );
+    }
+
+    _generateExistingItems(items) {
+        this._formatLinks(items.selectAll('.link'));
+        this._formatIndicators(items.selectAll('.indicator'));
+        this._formatLabels(items.selectAll('.label'));
+        this._formatOverlays(items.selectAll('.overlay'));
+    }
+
+    _generateEnterItems(items, rootItem) {
+        const enterItems = items
+            .enter()
+            .append('g')
+            .attr('class', 'item')
+            .attr('transform', () =>
+                transform().translate(d => [d.y, d.x])({
+                    x: rootItem.x0,
+                    y: rootItem.y0
+                })
+            )
+            .attr('cursor', 'pointer');
+
+        enterItems.call(d => d.lower());
+
+        enterItems
+            .style('opacity', 0)
+            .transition()
+            .duration(TRANSITION_DURATION)
+            .style('opacity', 1);
+
+        this._formatLinks(enterItems.append('path', 'g').attr('class', 'link'));
+
+        this._formatIndicators(
+            enterItems.append('circle').attr('class', 'indicator')
+        );
+        this._formatLabels(enterItems.append('text').attr('class', 'label'));
+        this._formatOverlays(
+            enterItems.append('rect').attr('class', 'overlay')
+        );
+
+        return enterItems;
+    }
+
+    _generateExitItems(items, rootItem) {
+        const exitItems = items.exit();
+
+        exitItems
+            .selectAll('.link')
+            .transition()
+            .duration(TRANSITION_DURATION)
+            .attr('d', () =>
+                elbow(
+                    { x: rootItem.x, y: rootItem.y },
+                    { x: rootItem.x, y: rootItem.y }
+                )
+            )
+            .attr('transform', d =>
+                transform().translate(d => [d.y, d.x])({
+                    x: -rootItem.x,
+                    y: -rootItem.y
+                })
+            );
+
+        exitItems
+            .style('opacity', 1)
+            .transition()
+            .duration(TRANSITION_DURATION)
+            .style('opacity', 0)
+            .attr('transform', () =>
+                transform().translate(d => [d.y, d.x])({
+                    x: rootItem.x,
+                    y: rootItem.y
+                })
+            )
+            .remove();
+
+        return exitItems;
+    }
+
+    _generateUpdateItems(items, enterItems) {
+        const updateItems = enterItems.merge(items);
+
+        updateItems
+            .on('click', item => this._handleOnItemClick(item))
+            .on('mouseover', item => this._handleOnItemMouseOver(item))
+            .on('mouseleave', item => this._handleOnItemMouseLeave(item));
+
+        updateItems.attr('transform', d =>
+            transform().translate(d => [d.y, d.x])({
+                x: d.x,
+                y: d.y
+            })
+        );
+
+        this._formatLinks(updateItems.selectAll('.link'));
+
+        return updateItems;
+    }
+
+    _formatIndicators(indicators) {
+        const that = this;
+
+        return indicators
+            .attr('r', 5)
+            .attr('cx', 0)
+            .attr('cy', 0)
+            .attr('stroke-width', 5)
+            .attr('stroke', function(d) {
+                if (this.parentNode.getAttribute('is-selected') === 'true') {
+                    return SELECTED_COLOR;
+                }
+
+                if (this.parentNode.getAttribute('is-hover') === 'true') {
+                    return HOVER_COLOR;
+                }
+
+                if (
+                    d.data[that._getConfig('childTypeKey')] ===
+                    that._getConfig('leafType')
+                ) {
+                    return LEAF_COLOR;
+                }
+
+                if (!d.parent) {
+                    return ROOT_COLOR;
+                }
+
+                return NODE_COLOR;
+            })
+            .attr('fill', function(d) {
+                if (this.parentNode.getAttribute('is-selected') === 'true') {
+                    return SELECTED_COLOR;
+                }
+
+                if (this.parentNode.getAttribute('is-hover') === 'true') {
+                    return HOVER_COLOR;
+                }
+
+                if (
+                    d.data[that._getConfig('childTypeKey')] ===
+                    that._getConfig('leafType')
+                ) {
+                    return LEAF_COLOR;
+                }
+
+                if (!d.parent) {
+                    return ROOT_COLOR;
+                }
+
+                return NODE_COLOR;
+            });
+    }
+
+    _formatLabels(labels) {
+        return labels
+            .attr('font-weight', d => {
+                if (
+                    d.data[this._getConfig('childTypeKey')] ===
+                    this._getConfig('leafType')
+                ) {
+                    return 600;
+                }
+
+                return 300;
+            })
+            .attr('dy', -15)
+            .attr('x', 0)
+            .style('fill', '#10183a')
+            .attr('text-anchor', () => 'middle')
+            .text(this._getConfig('formatLabelText'));
+    }
+
+    _formatLinks(links) {
+        return links
+            .attr('fill', 'none')
+            .attr('d', function(d) {
+                if (!d.parent) {
+                    return null;
+                }
+
+                return elbow(d.parent, d);
+            })
+            .attr('stroke', function() {
+                if (this.parentNode.getAttribute('is-selected') === 'true') {
+                    return SELECTED_COLOR;
+                }
+
+                if (this.parentNode.getAttribute('is-hover') === 'true') {
+                    return HOVER_COLOR;
+                }
+
+                return LINK_COLOR;
+            })
+            .attr('transform', function(d) {
+                if (!d.parent) {
+                    return null;
+                }
+
+                return transform().translate(d => [d.y, d.x])({
+                    x: -getTranslation(
+                        select(this.parentNode).attr('transform')
+                    )[1],
+                    y: -getTranslation(
+                        select(this.parentNode).attr('transform')
+                    )[0]
+                });
+            })
+            .attr('stroke-dasharray', d =>
+                d.data[this._getConfig('childrenKey')].length > 0
+                    ? null
+                    : this._getConfig('leafDashArraySize')
+            )
+            .attr('stroke-width', 2);
+    }
+
+    _formatOverlays(node) {
+        return node
+            .attr('x', -25)
+            .attr('y', -25)
+            .attr('height', 50)
+            .attr('width', 50)
+            .style('fill', 'none')
+            .style('pointer-events', 'all');
+    }
+
     updateData(data) {
         this.data = hierarchy(data, this._getConfig('childrenKeySelector'));
 
@@ -186,27 +496,19 @@ class _d3 {
 
     _unselectNodes() {
         this.svg
-            .selectAll('.node')
+            .selectAll('.item')
             .filter(function() {
                 return this.getAttribute('is-selected') === 'true';
             })
             .attr('is-selected', null);
 
-        this._formatLink(
-            this.svg.selectAll('path').filter(function() {
-                return this.parentNode.getAttribute('is-selected') === 'true';
-            })
-        );
-        this._formatIndicator(
-            this.svg.selectAll('.indicator').filter(function() {
-                return this.parentNode.getAttribute('is-selected') === 'true';
-            })
-        );
+        this._formatLinks(this.svg.selectAll('.link'));
+        this._formatIndicators(this.svg.selectAll('.indicator'));
     }
 
     _selectNode(d) {
         this.svg
-            .selectAll('.node')
+            .selectAll('.item')
             .filter(
                 node =>
                     d
@@ -219,30 +521,8 @@ class _d3 {
                 select(this).raise();
             });
 
-        this._formatLink(
-            this.svg
-                .selectAll('path')
-                .filter(
-                    node =>
-                        d
-                            .ancestors()
-                            .reverse()
-                            .indexOf(node) >= 0
-                )
-                .attr('is-selected', 'true')
-        );
-        this._formatIndicator(
-            this.svg
-                .selectAll('.indicator')
-                .filter(
-                    node =>
-                        d
-                            .ancestors()
-                            .reverse()
-                            .indexOf(node) >= 0
-                )
-                .attr('is-selected', 'true')
-        );
+        this._formatLinks(this.svg.selectAll('.link'));
+        this._formatIndicators(this.svg.selectAll('.indicator'));
     }
 
     _searchTree(node, searchString, pathArray) {
@@ -307,353 +587,21 @@ class _d3 {
         return expandedNode;
     }
 
-    _handleClick(d) {
-        if (
-            d.data[this._getConfig('childTypeKey')] ===
-            this._getConfig('leafType')
-        ) {
-            this._getConfig('onLeafClick')(d);
-        }
+    _updateD3(rootItem) {
+        this._generateItems(
+            rootItem,
+            this.tree(this.data)
+                .descendants()
+                .map(node => {
+                    const updatedNode = node;
+                    updatedNode.y =
+                        updatedNode.depth * this._getConfig('nodeDistance');
+                    updatedNode.x0 = node.x;
+                    updatedNode.y0 = node.y;
 
-        if (this._childrenKeySelector(d)) {
-            this.resetSelection();
-            this._collapseDescendants(d);
-        } else {
-            this._expandChildren(d);
-        }
-
-        this._updateD3(d);
-    }
-
-    _formatIndicator(node) {
-        const that = this;
-
-        return node
-            .attr('r', 5)
-            .attr('cx', 0)
-            .attr('cy', 0)
-            .attr('stroke-width', 5)
-            .attr('stroke', function(d) {
-                if (this.parentNode.getAttribute('is-selected') === 'true') {
-                    return SELECTED_COLOR;
-                }
-
-                if (this.parentNode.getAttribute('is-hover') === 'true') {
-                    return HOVER_COLOR;
-                }
-
-                if (
-                    d.data[that._getConfig('childTypeKey')] ===
-                    that._getConfig('leafType')
-                ) {
-                    return LEAF_COLOR;
-                }
-
-                if (!d.parent) {
-                    return ROOT_COLOR;
-                }
-
-                return NODE_COLOR;
-            })
-            .attr('fill', function(d) {
-                if (this.parentNode.getAttribute('is-selected') === 'true') {
-                    return SELECTED_COLOR;
-                }
-
-                if (this.parentNode.getAttribute('is-hover') === 'true') {
-                    return HOVER_COLOR;
-                }
-
-                if (
-                    d.data[that._getConfig('childTypeKey')] ===
-                    that._getConfig('leafType')
-                ) {
-                    return LEAF_COLOR;
-                }
-
-                if (!d.parent) {
-                    return ROOT_COLOR;
-                }
-
-                return NODE_COLOR;
-            });
-    }
-
-    _formatLabel(node) {
-        return node
-            .attr('font-weight', d => {
-                if (
-                    d.data[this._getConfig('childTypeKey')] ===
-                    this._getConfig('leafType')
-                ) {
-                    return 600;
-                }
-
-                return 300;
-            })
-            .attr('dy', -15)
-            .attr('x', 0)
-            .style('fill', '#10183a')
-            .attr('text-anchor', () => 'middle')
-            .text(this._getConfig('formatLabelText'));
-    }
-
-    _formatLink(node) {
-        return node
-            .attr('fill', 'none')
-            .attr('d', function(d) {
-                if (!d.parent) {
-                    return null;
-                }
-
-                return elbow(d.parent, d);
-            })
-            .attr('stroke', function() {
-                if (this.parentNode.getAttribute('is-selected') === 'true') {
-                    return SELECTED_COLOR;
-                }
-
-                if (this.parentNode.getAttribute('is-hover') === 'true') {
-                    return HOVER_COLOR;
-                }
-
-                return LINK_COLOR;
-            })
-            .attr('transform', function(d) {
-                if (!d.parent) {
-                    return null;
-                }
-
-                return transform().translate(d => [d.y, d.x])({
-                    x: -getTranslation(
-                        select(this.parentNode).attr('transform')
-                    )[1],
-                    y: -getTranslation(
-                        select(this.parentNode).attr('transform')
-                    )[0]
-                });
-            })
-            .attr('stroke-dasharray', d =>
-                d.data[this._getConfig('childrenKey')].length > 0
-                    ? null
-                    : this._getConfig('leafDashArraySize')
-            )
-            .attr('stroke-width', 2);
-    }
-
-    _formatOverlay(node) {
-        return node
-            .attr('x', -25)
-            .attr('y', -25)
-            .attr('height', 50)
-            .attr('width', 50)
-            .style('fill', 'none')
-            .style('pointer-events', 'all');
-    }
-
-    _handleMouseOver(d) {
-        this.svg
-            .selectAll('.node')
-            .filter(
-                node =>
-                    d
-                        .ancestors()
-                        .reverse()
-                        .indexOf(node) >= 0
-            )
-            .attr('is-hover', 'true')
-            .each(function() {
-                select(this).raise();
-            });
-
-        this._formatLink(
-            this.svg
-                .selectAll('.link')
-                .filter(
-                    node =>
-                        d
-                            .ancestors()
-                            .reverse()
-                            .indexOf(node) >= 0
-                )
-                .transition()
-                .duration(TRANSITION_DURATION)
-        );
-        this._formatIndicator(
-            this.svg
-                .selectAll('.indicator')
-                .filter(
-                    node =>
-                        d
-                            .ancestors()
-                            .reverse()
-                            .indexOf(node) >= 0
-                )
-                .transition()
-                .duration(TRANSITION_DURATION)
-        );
-    }
-
-    _handleMouseLeave(d) {
-        this.svg
-            .selectAll('.node')
-            .filter(
-                node =>
-                    d
-                        .ancestors()
-                        .reverse()
-                        .indexOf(node) >= 0
-            )
-            .attr('is-hover', null);
-
-        this._formatLink(
-            this.svg
-                .selectAll('path')
-                .filter(
-                    node =>
-                        d
-                            .ancestors()
-                            .reverse()
-                            .indexOf(node) >= 0
-                )
-                .transition()
-                .duration(TRANSITION_DURATION)
-        );
-        this._formatIndicator(
-            this.svg
-                .selectAll('.indicator')
-                .filter(
-                    node =>
-                        d
-                            .ancestors()
-                            .reverse()
-                            .indexOf(node) >= 0
-                )
-                .transition()
-                .duration(TRANSITION_DURATION)
-        );
-    }
-
-    _generateExisting(node) {
-        this._formatLink(node.selectAll('.link'));
-        this._formatIndicator(node.selectAll('.indicator'));
-        this._formatLabel(node.selectAll('.label'));
-        this._formatOverlay(node.selectAll('.overlay'));
-    }
-
-    _generateEnter(node, target) {
-        const nodeEnter = node
-            .enter()
-            .append('g')
-            .attr('class', 'node')
-            .attr('id', d => d.data[this._getConfig('uniqueIdKey')])
-            .attr('transform', d =>
-                transform().translate(d => [d.y, d.x])({
-                    x: target.x0,
-                    y: target.y0
+                    return updatedNode;
                 })
-            )
-            .attr('cursor', 'pointer');
-
-        nodeEnter.call(d => d.lower());
-
-        nodeEnter
-            .style('opacity', 0)
-            .transition()
-            .duration(TRANSITION_DURATION)
-            .style('opacity', 1);
-
-        this._formatLink(nodeEnter.append('path', 'g').attr('class', 'link'));
-
-        this._formatIndicator(
-            nodeEnter.append('circle').attr('class', 'indicator')
         );
-        this._formatLabel(nodeEnter.append('text').attr('class', 'label'));
-        this._formatOverlay(nodeEnter.append('rect').attr('class', 'overlay'));
-
-        return nodeEnter;
-    }
-
-    _generateExit(node, target) {
-        node.exit()
-            .selectAll('.link')
-            .transition()
-            .duration(TRANSITION_DURATION)
-            .attr('d', () =>
-                elbow(
-                    { x: target.x, y: target.y },
-                    { x: target.x, y: target.y }
-                )
-            )
-            .attr('transform', d =>
-                transform().translate(d => [d.y, d.x])({
-                    x: -target.x,
-                    y: -target.y
-                })
-            );
-
-        node.exit()
-            .style('opacity', 1)
-            .transition()
-            .duration(TRANSITION_DURATION)
-            .style('opacity', 0)
-            .attr('transform', () =>
-                transform().translate(d => [d.y, d.x])({
-                    x: target.x,
-                    y: target.y
-                })
-            )
-            .remove();
-    }
-
-    _generateUpdate(node, enterNodes, target) {
-        const nodeUpdate = enterNodes.merge(node);
-
-        nodeUpdate
-            .on('click', d => this._handleClick(d))
-            .on('mouseover', d => this._handleMouseOver(d, target))
-            .on('mouseleave', d => this._handleMouseLeave(d, target));
-
-        nodeUpdate.attr('transform', d =>
-            transform().translate(d => [d.y, d.x])({
-                x: d.x,
-                y: d.y
-            })
-        );
-
-        this._formatLink(nodeUpdate.selectAll('.link'));
-    }
-
-    _generateNodes(target, data) {
-        const node = this.svg
-            .select('.container')
-            .selectAll('.node')
-            .data(data, d => d.data[this._getConfig('uniqueIdKey')]);
-
-        // Format existing stuff
-        this._generateExisting(node);
-
-        // Format exit stuff
-        this._generateExit(node, target);
-
-        // Format update stuff
-        this._generateUpdate(node, this._generateEnter(node, target), target);
-    }
-
-    _updateD3(target) {
-        const data = this.tree(this.data)
-            .descendants()
-            .map(node => {
-                const updatedNode = node;
-                updatedNode.y =
-                    updatedNode.depth * this._getConfig('nodeDistance');
-                updatedNode.x0 = node.x;
-                updatedNode.y0 = node.y;
-
-                return updatedNode;
-            });
-
-        this._generateNodes(target, data);
     }
 
     _zoomToPosition(y, x, scale) {
