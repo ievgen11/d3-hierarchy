@@ -45,9 +45,11 @@ class Hierarchy extends Component {
         super(props);
 
         this.handleFullscreen = this.handleFullscreen.bind(this);
+        this.handleResize = this.handleResize.bind(this);
         this.handleSearchSubmit = this.handleSearchSubmit.bind(this);
         this.handleSearchChange = this.handleSearchChange.bind(this);
         this.handleSearchClear = this.handleSearchClear.bind(this);
+        this.handleSelectionClear = this.handleSelectionClear.bind(this);
 
         this.state = {
             isFullscreen: false,
@@ -57,7 +59,6 @@ class Hierarchy extends Component {
 
     componentDidMount() {
         const {
-            onSelectionClear,
             selectedValue,
             svgClass,
             uniqueIdKey,
@@ -75,9 +76,12 @@ class Hierarchy extends Component {
             childTypeKey: childTypeKey,
             leafType: leafType,
             onLeafClick: onLeafClick,
-            onSelectionClear: onSelectionClear,
+            onSelectionClear: this.handleSelectionClear,
             formatLabelText: formatLabelText
         });
+
+        this.handleResize();
+        window.addEventListener('resize', this.handleResize);
     }
 
     componentDidUpdate(prevProps) {
@@ -104,8 +108,21 @@ class Hierarchy extends Component {
         }
     }
 
+    handleSelectionClear() {
+        const { onSelectionClear } = this.props;
+
+        this.setState(() => ({ searchString: '' }), onSelectionClear);
+    }
+
+    handleResize() {
+        this._d3.updateDimensions();
+    }
+
     handleFullscreen() {
-        this.setState(state => ({ isFullscreen: !state.isFullscreen }));
+        this.setState(
+            state => ({ isFullscreen: !state.isFullscreen }),
+            this.handleResize
+        );
     }
 
     handleSearchSubmit() {

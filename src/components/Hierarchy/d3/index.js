@@ -85,6 +85,13 @@ class _d3 {
         this._init(root);
     }
 
+    updateDimensions() {
+        const { width, height } = this.svg.node().getBoundingClientRect();
+
+        this.config.width = width > 0 ? width : DEFAULT_WIDTH;
+        this.config.height = height > 0 ? height : DEFAULT_HEIGHT;
+    }
+
     _handleOnItemClick(item) {
         if (
             item.data[this._getConfig('childTypeKey')] ===
@@ -414,14 +421,13 @@ class _d3 {
     }
 
     setSelection(selected) {
-        this.selected = selected;
-
         const items = this._findSelectedPathItems(this.data, selected, []);
 
         if (items) {
+            this.selected = selected;
             this._unselectNodes();
             this._expandItems(items);
-            this._focusOnSelectedNode(items.slice(-1)[0]);
+            this._zoomToItem(items.slice(-1)[0]);
         }
     }
 
@@ -450,6 +456,12 @@ class _d3 {
     }
 
     resetZoom() {
+        if (this.selected) {
+            return this._zoomToItem(
+                this._findSelectedPathItems(this.data, this.selected, []).pop()
+            );
+        }
+
         this._zoomToPosition(this._getConfig('nodeDistance') / 2, 0, 1);
     }
 
@@ -478,14 +490,6 @@ class _d3 {
             this._expandChildren(items[i]);
             this._updateD3(items[i]);
         }
-    }
-
-    _focusOnSelectedNode(node) {
-        setTimeout(() => {
-            const { y, x } = select(node).node();
-            this._selectNode(node);
-            this._zoomToPosition(y, x, 1.5);
-        }, TRANSITION_DURATION);
     }
 
     _unselectNodes() {
@@ -598,6 +602,14 @@ class _d3 {
         );
     }
 
+    _zoomToItem(item) {
+        setTimeout(() => {
+            const { y, x } = select(item).node();
+            this._selectNode(item);
+            this._zoomToPosition(y, x, 1.5);
+        }, TRANSITION_DURATION);
+    }
+
     _zoomToPosition(y, x, scale) {
         this.svg
             .call(this.zoom)
@@ -615,11 +627,6 @@ class _d3 {
     }
 
     _init(root) {
-        const { width, height } = root.node().getBoundingClientRect();
-
-        this.config.width = width > 0 ? width : DEFAULT_WIDTH;
-        this.config.height = height > 0 ? height : DEFAULT_HEIGHT;
-
         this.svg = root
             .append('svg')
             .attr('class', this._getConfig('svgClass'))
