@@ -14,6 +14,7 @@ class Hierarchy extends Component {
         isError: PropTypes.bool.isRequired,
         isPending: PropTypes.bool.isRequired,
         getDataAction: PropTypes.func.isRequired,
+        setSelectedValue: PropTypes.func.isRequired,
         resetSelectedValue: PropTypes.func.isRequired
     };
 
@@ -29,7 +30,8 @@ class Hierarchy extends Component {
             isPending,
             isError,
             selectedValue,
-            resetSelectedValue
+            resetSelectedValue,
+            setSelectedValue
         } = this.props;
 
         return (
@@ -55,7 +57,8 @@ class Hierarchy extends Component {
                 }}
                 isPending={isPending}
                 isError={isError}
-                selectedValue={"RUARH"}
+                selectedValue={selectedValue}
+                onSearchSubmit={searchString => setSelectedValue(searchString)}
                 onSelectionClear={() => resetSelectedValue()}
             />
         );
@@ -71,6 +74,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
     getDataAction: () => dispatch(actions.getData()),
+    setSelectedValue: searchString => dispatch(actions.setSelectedValue(searchString)),
     resetSelectedValue: () => dispatch(actions.resetSelectedValue())
 });
 

@@ -2,7 +2,7 @@ import * as actionTypes from "../actionTypes";
 import { Record } from "immutable";
 
 const Model = Record({
-    selectedValue: ''
+    selectedValue: null
 });
 
 const initialState = Model();
@@ -15,7 +15,7 @@ const UserReducer = (state = initialState, action) => {
             });
         case actionTypes.RESET_SELECTED_VALUE:
             return state.withMutations(mutant => {
-                mutant.set("selectedValue", '');
+                mutant.set("selectedValue", null);
             });
         default:
             return state;

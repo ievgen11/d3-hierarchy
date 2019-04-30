@@ -404,23 +404,24 @@ class _d3 {
             );
         }
 
-        this._updateD3(this.data);
-
-        if (this.selected !== null) {
-            this.updateSelection(this.selected);
-        }
+        this._updateD3();
 
         this._zoomToPosition(this._getConfig('nodeDistance') / 2, 0, 1);
+
+        if (this.selected !== null) {
+            this.setSelection(this.selected);
+        }
     }
 
-    updateSelection(selected) {
+    setSelection(selected) {
         this.selected = selected;
 
-        const nodes = this._searchTree(this.data, selected, []);
+        const items = this._findSelectedPathItems(this.data, selected, []);
 
-        if (nodes) {
+        if (items) {
             this._unselectNodes();
-            this._expandSelected(nodes);
+            this._expandItems(items);
+            this._focusOnSelectedNode(items.slice(-1)[0]);
         }
     }
 
@@ -428,10 +429,9 @@ class _d3 {
         this.selected = null;
 
         this._unselectNodes();
+        this._updateD3();
 
         this._getConfig('onSelectionClear')();
-
-        this._updateD3(this.data);
     }
 
     reload() {
@@ -446,7 +446,7 @@ class _d3 {
         }
 
         this._zoomToPosition(this._getConfig('nodeDistance') / 2, 0, 1);
-        this._updateD3(this.data);
+        this._updateD3();
     }
 
     resetZoom() {
@@ -473,16 +473,10 @@ class _d3 {
         return d[this._getConfig('childrenKey')];
     }
 
-    _expandSelected(nodes) {
-        this._collapseDescendants(this.data);
-
-        for (let i = 0, len = nodes.length; i < len; i += 1) {
-            this._expandChildren(nodes[i]);
-            this._updateD3(nodes[i]);
-
-            if (i === nodes.length - 1) {
-                this._focusOnSelectedNode(nodes[i]);
-            }
+    _expandItems(items) {
+        for (let i = 0, len = items.length; i < len; i += 1) {
+            this._expandChildren(items[i]);
+            this._updateD3(items[i]);
         }
     }
 
@@ -525,7 +519,7 @@ class _d3 {
         this._formatIndicators(this.svg.selectAll('.indicator'));
     }
 
-    _searchTree(node, searchString, pathArray) {
+    _findSelectedPathItems(node, searchString, pathArray) {
         if (node.data[this._getConfig('uniqueIdKey')] === searchString) {
             pathArray.push(node);
 
@@ -543,7 +537,7 @@ class _d3 {
         for (let i = 0; i < children.length; i += 1) {
             pathArray.push(node);
 
-            const found = this._searchTree(
+            const found = this._findSelectedPathItems(
                 children[i],
                 searchString,
                 pathArray
@@ -587,7 +581,7 @@ class _d3 {
         return expandedNode;
     }
 
-    _updateD3(rootItem) {
+    _updateD3(rootItem = this.data) {
         this._generateItems(
             rootItem,
             this.tree(this.data)
