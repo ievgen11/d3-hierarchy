@@ -38,20 +38,9 @@ function elbow(s, d) {
 }
 
 function getTranslation(transform) {
-    // Create a dummy g for calculation purposes only. This will never
-    // be appended to the DOM and will be discarded once this function
-    // returns.
     var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-
-    // Set the transform attribute to the provided string value.
     g.setAttributeNS(null, 'transform', transform);
-
-    // consolidate the SVGTransformList containing all transformations
-    // to a single SVGTransform of type SVG_TRANSFORM_MATRIX and get
-    // its SVGMatrix.
     var matrix = g.transform.baseVal.consolidate().matrix;
-
-    // As per definition values e and f are the ones for the translation.
     return [matrix.e, matrix.f];
 }
 
@@ -196,25 +185,40 @@ class _d3 {
     }
 
     _unselectNodes() {
+        this.svg
+            .selectAll('.node')
+            .filter(function() {
+                return this.getAttribute('is-selected') === 'true';
+            })
+            .attr('is-selected', null);
+
         this._formatLink(
-            this.svg
-                .selectAll('path')
-                .filter(function() {
-                    return this.getAttribute('is-selected') === 'true';
-                })
-                .attr('is-selected', null)
+            this.svg.selectAll('path').filter(function() {
+                return this.parentNode.getAttribute('is-selected') === 'true';
+            })
         );
         this._formatIndicator(
-            this.svg
-                .selectAll('.indicator')
-                .filter(function() {
-                    return this.getAttribute('is-selected') === 'true';
-                })
-                .attr('is-selected', null)
+            this.svg.selectAll('.indicator').filter(function() {
+                return this.parentNode.getAttribute('is-selected') === 'true';
+            })
         );
     }
 
     _selectNode(d) {
+        this.svg
+            .selectAll('.node')
+            .filter(
+                node =>
+                    d
+                        .ancestors()
+                        .reverse()
+                        .indexOf(node) >= 0
+            )
+            .attr('is-selected', 'true')
+            .each(function() {
+                select(this).raise();
+            });
+
         this._formatLink(
             this.svg
                 .selectAll('path')
@@ -330,11 +334,11 @@ class _d3 {
             .attr('cy', 0)
             .attr('stroke-width', 5)
             .attr('stroke', function(d) {
-                if (this.getAttribute('is-selected') === 'true') {
+                if (this.parentNode.getAttribute('is-selected') === 'true') {
                     return SELECTED_COLOR;
                 }
 
-                if (this.getAttribute('is-hover') === 'true') {
+                if (this.parentNode.getAttribute('is-hover') === 'true') {
                     return HOVER_COLOR;
                 }
 
@@ -352,11 +356,11 @@ class _d3 {
                 return NODE_COLOR;
             })
             .attr('fill', function(d) {
-                if (this.getAttribute('is-selected') === 'true') {
+                if (this.parentNode.getAttribute('is-selected') === 'true') {
                     return SELECTED_COLOR;
                 }
 
-                if (this.getAttribute('is-hover') === 'true') {
+                if (this.parentNode.getAttribute('is-hover') === 'true') {
                     return HOVER_COLOR;
                 }
 
@@ -405,11 +409,11 @@ class _d3 {
                 return elbow(d.parent, d);
             })
             .attr('stroke', function() {
-                if (this.getAttribute('is-selected') === 'true') {
+                if (this.parentNode.getAttribute('is-selected') === 'true') {
                     return SELECTED_COLOR;
                 }
 
-                if (this.getAttribute('is-hover') === 'true') {
+                if (this.parentNode.getAttribute('is-hover') === 'true') {
                     return HOVER_COLOR;
                 }
 
@@ -430,7 +434,9 @@ class _d3 {
                 });
             })
             .attr('stroke-dasharray', d =>
-                d.data[this._getConfig('childrenKey')].length > 0 ? null : this._getConfig('leafDashArraySize')
+                d.data[this._getConfig('childrenKey')].length > 0
+                    ? null
+                    : this._getConfig('leafDashArraySize')
             )
             .attr('stroke-width', 2);
     }
@@ -455,7 +461,8 @@ class _d3 {
                         .reverse()
                         .indexOf(node) >= 0
             )
-            .filter(function() {
+            .attr('is-hover', 'true')
+            .each(function() {
                 select(this).raise();
             });
 
@@ -469,7 +476,6 @@ class _d3 {
                             .reverse()
                             .indexOf(node) >= 0
                 )
-                .attr('is-hover', 'true')
                 .transition()
                 .duration(TRANSITION_DURATION)
         );
@@ -483,30 +489,46 @@ class _d3 {
                             .reverse()
                             .indexOf(node) >= 0
                 )
-                .attr('is-hover', 'true')
                 .transition()
                 .duration(TRANSITION_DURATION)
         );
     }
 
-    _handleMouseLeave() {
+    _handleMouseLeave(d) {
+        this.svg
+            .selectAll('.node')
+            .filter(
+                node =>
+                    d
+                        .ancestors()
+                        .reverse()
+                        .indexOf(node) >= 0
+            )
+            .attr('is-hover', null);
+
         this._formatLink(
             this.svg
                 .selectAll('path')
-                .filter(function() {
-                    return this.getAttribute('is-hover') === 'true';
-                })
-                .attr('is-hover', null)
+                .filter(
+                    node =>
+                        d
+                            .ancestors()
+                            .reverse()
+                            .indexOf(node) >= 0
+                )
                 .transition()
                 .duration(TRANSITION_DURATION)
         );
         this._formatIndicator(
             this.svg
                 .selectAll('.indicator')
-                .filter(function() {
-                    return this.getAttribute('is-hover') === 'true';
-                })
-                .attr('is-hover', null)
+                .filter(
+                    node =>
+                        d
+                            .ancestors()
+                            .reverse()
+                            .indexOf(node) >= 0
+                )
                 .transition()
                 .duration(TRANSITION_DURATION)
         );

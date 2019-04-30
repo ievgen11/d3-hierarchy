@@ -23,7 +23,7 @@ export const ROOT_COLOR = '#EFC958';
 export const NODE_COLOR = '#E17A47';
 export const LEAF_COLOR = '#EF3D59';
 export const LINK_COLOR = '#e6e6ea';
-export const SELECTED_COLOR = '#05c46b';
+export const SELECTED_COLOR = '#EFC958';
 export const HOVER_COLOR = '#4AB19D';
 
 // MISC
