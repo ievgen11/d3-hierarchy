@@ -23,21 +23,14 @@ class Hierarchy extends Component {
         selectedValue: PropTypes.string,
         onSelectionClear: PropTypes.func,
         onSearchSubmit: PropTypes.func,
-        svgClass: PropTypes.string,
-        uniqueIdKey: PropTypes.string,
-        childTypeKey: PropTypes.string,
-        leafType: PropTypes.string.isRequired,
-        onLeafClick: PropTypes.func.isRequired,
-        formatLabelText: PropTypes.func.isRequired
+        onItemClick: PropTypes.func.isRequired,
+        formatLabelText: PropTypes.func
     };
 
     static defaultProps = {
         isPending: false,
         minWidth: 'auto',
         minHeight: 'auto',
-        svgClass: 'geo-hierarchy',
-        uniqueIdKey: 'location',
-        childTypeKey: 'type',
         selectedValue: null
     };
 
@@ -60,22 +53,14 @@ class Hierarchy extends Component {
     componentDidMount() {
         const {
             selectedValue,
-            svgClass,
-            uniqueIdKey,
-            childTypeKey,
-            leafType,
-            onLeafClick,
+            onItemClick,
             formatLabelText
         } = this.props;
 
         this._d3 = new _d3({
             root: this._root,
             selectedValue: selectedValue,
-            svgClass: svgClass,
-            uniqueIdKey: uniqueIdKey,
-            childTypeKey: childTypeKey,
-            leafType: leafType,
-            onLeafClick: onLeafClick,
+            onItemClick: onItemClick,
             onSelectionClear: this.handleSelectionClear,
             formatLabelText: formatLabelText
         });

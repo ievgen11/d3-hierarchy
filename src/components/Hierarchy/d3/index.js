@@ -25,8 +25,6 @@ import {
     DEFAULT_WIDTH,
     DEFAULT_SVG_CLASS,
     DEFAULT_ON_SELECTION_CLEAR,
-    DEFAULT_LEAF_TYPE,
-    DEFAULT_CHILD_TYPE_KEY,
     DEFAULT_LEAF_DASH_ARRAY_SIZE
 } from './constants';
 
@@ -53,12 +51,10 @@ class _d3 {
         scaleExtent = DEFAULT_SCALE_EXTENT,
         childrenKey = DEFAULT_CHILDREN_KEY,
         uniqueIdKey = DEFAULT_UNIQUE_ID_KEY,
-        onLeafClick = DEFAULT_ON_NODE_CLICK,
+        onItemClick = DEFAULT_ON_NODE_CLICK,
         formatLabelText = DEFAULT_FORMAT_LABEL_TEXT,
         svgClass = DEFAULT_SVG_CLASS,
         onSelectionClear = DEFAULT_ON_SELECTION_CLEAR,
-        leafType = DEFAULT_LEAF_TYPE,
-        childTypeKey = DEFAULT_CHILD_TYPE_KEY,
         leafDashArraySize = DEFAULT_LEAF_DASH_ARRAY_SIZE,
         selectedValue = null
     }) {
@@ -69,12 +65,10 @@ class _d3 {
             scaleExtent,
             childrenKey,
             uniqueIdKey,
-            onLeafClick,
+            onItemClick,
             formatLabelText,
             svgClass,
             onSelectionClear,
-            leafType,
-            childTypeKey,
             leafDashArraySize
         };
 
@@ -93,12 +87,7 @@ class _d3 {
     }
 
     _handleOnItemClick(item) {
-        if (
-            item.data[this._getConfig('childTypeKey')] ===
-            this._getConfig('leafType')
-        ) {
-            this._getConfig('onLeafClick')(item);
-        }
+        this._getConfig('onItemClick')(item);
 
         if (this._childrenKeySelector(item)) {
             this.resetSelection();
@@ -294,8 +283,7 @@ class _d3 {
                 }
 
                 if (
-                    d.data[that._getConfig('childTypeKey')] ===
-                    that._getConfig('leafType')
+                    d.data[that._getConfig('childrenKey')].length === 0
                 ) {
                     return LEAF_COLOR;
                 }
@@ -316,8 +304,7 @@ class _d3 {
                 }
 
                 if (
-                    d.data[that._getConfig('childTypeKey')] ===
-                    that._getConfig('leafType')
+                    d.data[that._getConfig('childrenKey')].length === 0
                 ) {
                     return LEAF_COLOR;
                 }
@@ -334,8 +321,7 @@ class _d3 {
         return labels
             .attr('font-weight', d => {
                 if (
-                    d.data[this._getConfig('childTypeKey')] ===
-                    this._getConfig('leafType')
+                    d.data[this._getConfig('childrenKey')].length === 0
                 ) {
                     return 600;
                 }

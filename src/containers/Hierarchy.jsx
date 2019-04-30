@@ -39,21 +39,18 @@ class Hierarchy extends Component {
                 data={data}
                 minWidth={800}
                 minHeight={600}
-                leafType="Port"
-                onLeafClick={node => {
+                onItemClick={node => {
+                    if (node.data.children.length !== 0) {
+                        return;
+                    }
+
                     window
                         .open(
-                            `http://locode.info/${node.data.location}`,
+                            `https://www.google.com/search?q=${node.data.name}`,
                             '_blank'
                         )
                         .focus();
                     return;
-                }}
-                formatLabelText={node => {
-                    if (node.data.type === 'Port') {
-                        return `${node.data.name} (${node.data.location})`;
-                    }
-                    return node.data.name;
                 }}
                 isPending={isPending}
                 isError={isError}
@@ -74,7 +71,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
     getDataAction: () => dispatch(actions.getData()),
-    setSelectedValue: searchString => dispatch(actions.setSelectedValue(searchString)),
+    setSelectedValue: searchString =>
+        dispatch(actions.setSelectedValue(searchString)),
     resetSelectedValue: () => dispatch(actions.resetSelectedValue())
 });
 

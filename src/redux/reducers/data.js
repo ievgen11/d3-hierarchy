@@ -19,7 +19,7 @@ const UserReducer = (state = initialState, action) => {
             return state.withMutations(mutant => {
                 mutant.set("isPending", false);
                 mutant.set("isError", false);
-                mutant.set("data", fromJS(action.payload[0]));
+                mutant.set("data", fromJS(action.payload));
             });
         case actionTypes.GET_DATA.PENDING:
             return state.withMutations(mutant => {

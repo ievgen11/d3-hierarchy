@@ -22,6 +22,7 @@ import '@material/notched-outline/dist/mdc.notched-outline.css';
 import '@material/line-ripple/dist/mdc.line-ripple.css';
 import '@material/typography/dist/mdc.typography.css';
 import '@material/button/dist/mdc.button.css';
+import '@material/dialog/dist/mdc.dialog.css';
 
 import './styles/app.css';
 

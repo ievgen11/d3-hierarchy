@@ -6,6 +6,7 @@
     "dependencies": {
         "@rmwc/button": "^5.4.2",
         "@rmwc/circular-progress": "^5.3.1",
+        "@rmwc/dialog": "^5.4.2",
         "@rmwc/fab": "^5.3.1",
         "@rmwc/icon": "^5.3.1",
         "@rmwc/provider": "^5.2.1",
@@ -24,6 +25,7 @@
         "normalize.css": "^8.0.1",
         "react": "^16.1.1",
         "react-dom": "^16.1.1",
+        "react-json-view": "^1.19.1",
         "react-redux": "^5.0.5",
         "react-router-dom": "^4.3.1",
         "react-router-redux": "^4.0.7",
