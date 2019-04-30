@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { RMWCProvider } from '@rmwc/provider';
-import { ThemeProvider } from '@rmwc/theme';
 import { Provider } from 'react-redux';
 import store from './redux/store/configureStore';
 
@@ -12,7 +11,7 @@ import {
     Redirect
 } from 'react-router-dom';
 
-import Hierarchy from './containers/Hierarchy';
+import Hierarchy from './pages/Hierarchy';
 
 import '@rmwc/icon/icon.css';
 import '@rmwc/circular-progress/circular-progress.css';
@@ -21,31 +20,21 @@ import '@material/textfield/dist/mdc.textfield.css';
 import '@material/floating-label/dist/mdc.floating-label.css';
 import '@material/notched-outline/dist/mdc.notched-outline.css';
 import '@material/line-ripple/dist/mdc.line-ripple.css';
+import '@material/typography/dist/mdc.typography.css';
+import '@material/button/dist/mdc.button.css';
 
 import './styles/app.css';
 
 ReactDOM.render(
     <RMWCProvider>
-        <ThemeProvider
-            options={{
-                primary: '#fe4a49',
-                secondary: 'rgba(255, 255, 255, 1)',
-                onSecondary: '#000'
-            }}
-        >
-            <Provider store={store}>
-                <Router>
-                    <Switch>
-                        <Route
-                            exact
-                            path="/hierarchy"
-                            component={Hierarchy}
-                        />
-                        <Redirect to="/hierarchy" />
-                    </Switch>
-                </Router>
-            </Provider>
-        </ThemeProvider>
+        <Provider store={store}>
+            <Router>
+                <Switch>
+                    <Route exact path="/hierarchy" component={Hierarchy} />
+                    <Redirect to="/hierarchy" />
+                </Switch>
+            </Router>
+        </Provider>
     </RMWCProvider>,
     document.getElementById('root')
 );

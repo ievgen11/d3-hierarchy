@@ -1,0 +1,13 @@
+body {
+    margin: 0;
+}
+
+.page {
+    max-width: 900px;
+    margin: auto;
+}
+
+.section {
+    margin: 32px 0;
+    padding: 0 32px;
+}

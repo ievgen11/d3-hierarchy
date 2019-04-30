@@ -911,6 +911,18 @@
   dependencies:
     tslib "^1.9.3"
 
+"@material/button@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@material/button/-/button-1.1.1.tgz#35af0d295f6ce6e3df9d4978485b5294d794f682"
+  dependencies:
+    "@material/elevation" "^1.1.0"
+    "@material/feature-targeting" "^0.44.1"
+    "@material/ripple" "^1.1.0"
+    "@material/rtl" "^0.42.0"
+    "@material/shape" "^1.1.1"
+    "@material/theme" "^1.1.0"
+    "@material/typography" "^1.0.0"
+
 "@material/dom@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@material/dom/-/dom-1.1.0.tgz#3bd3d1a3415b4181118fecb182d93beda56a6f8c"
@@ -1069,6 +1081,17 @@
     hyperform "^0.9.9"
     mutation-observer "^1.0.3"
 
+"@rmwc/button@^5.4.2":
+  version "5.4.2"
+  resolved "https://registry.yarnpkg.com/@rmwc/button/-/button-5.4.2.tgz#54fb8c0f71f870dbf0f606587d4971b6f9ca33a0"
+  dependencies:
+    "@material/button" "^1.1.1"
+    "@rmwc/base" "^5.4.2"
+    "@rmwc/icon" "^5.4.2"
+    "@rmwc/provider" "^5.4.2"
+    "@rmwc/ripple" "^5.4.2"
+    "@rmwc/types" "^5.4.2"
+
 "@rmwc/circular-progress@^5.3.1":
   version "5.3.1"
   resolved "https://registry.yarnpkg.com/@rmwc/circular-progress/-/circular-progress-5.3.1.tgz#81a6d768b8f0bcf7584e80e7f33c54105c9f5b10"
@@ -1198,6 +1221,14 @@
 "@rmwc/types@^5.4.2":
   version "5.4.2"
   resolved "https://registry.yarnpkg.com/@rmwc/types/-/types-5.4.2.tgz#91f3f30775ccdde8d78a1723ae1d73a89d7ef49f"
+
+"@rmwc/typography@^5.4.2":
+  version "5.4.2"
+  resolved "https://registry.yarnpkg.com/@rmwc/typography/-/typography-5.4.2.tgz#0b86559027058ca2c2bfd576a26c7fa6eca2bd9b"
+  dependencies:
+    "@material/typography" "^1.0.0"
+    "@rmwc/base" "^5.4.2"
+    "@rmwc/types" "^5.4.2"
 
 "@svgr/babel-plugin-add-jsx-attribute@^4.0.0":
   version "4.0.0"
