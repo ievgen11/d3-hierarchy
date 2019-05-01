@@ -21,7 +21,7 @@ import {
     DEFAULT_ON_NODE_CLICK,
     DEFAULT_SCALE_EXTENT,
     DEFAULT_SCALE_STEP,
-    DEFAULT_UNIQUE_ID_KEY,
+    DEFAULT_SEARCH_QUERY_KEY,
     DEFAULT_WIDTH,
     DEFAULT_SVG_CLASS,
     DEFAULT_ON_SELECTION_CLEAR,
@@ -50,13 +50,13 @@ class _d3 {
         scaleStep = DEFAULT_SCALE_STEP,
         scaleExtent = DEFAULT_SCALE_EXTENT,
         childrenKey = DEFAULT_CHILDREN_KEY,
-        uniqueIdKey = DEFAULT_UNIQUE_ID_KEY,
+        searchQueryKey = DEFAULT_SEARCH_QUERY_KEY,
         onItemClick = DEFAULT_ON_NODE_CLICK,
         formatLabelText = DEFAULT_FORMAT_LABEL_TEXT,
         svgClass = DEFAULT_SVG_CLASS,
         onSelectionClear = DEFAULT_ON_SELECTION_CLEAR,
         leafDashArraySize = DEFAULT_LEAF_DASH_ARRAY_SIZE,
-        selectedValue = null
+        searchQuery = null
     }) {
         this.config = {
             nodeSize,
@@ -64,7 +64,7 @@ class _d3 {
             scaleStep,
             scaleExtent,
             childrenKey,
-            uniqueIdKey,
+            searchQueryKey,
             onItemClick,
             formatLabelText,
             svgClass,
@@ -74,18 +74,9 @@ class _d3 {
 
         this.tree = tree().nodeSize(nodeSize);
         this.data = hierarchy({});
-        this.selected = selectedValue;
+        this.searchQuery = searchQuery;
 
         this._init(root);
-    }
-
-    updateDimensions() {
-        const { width, height } = this.svg.node().getBoundingClientRect();
-
-        this.config.width = width > 0 ? width : DEFAULT_WIDTH;
-        this.config.height = height > 0 ? height : DEFAULT_HEIGHT;
-
-        this.resetZoom();
     }
 
     _handleOnItemClick(item) {
@@ -160,7 +151,7 @@ class _d3 {
         const items = this.svg
             .select('.container')
             .selectAll('.item')
-            .data(data, d => d.data[this._getConfig('uniqueIdKey')]);
+            .data(data, d => d.data[this._getConfig('searchQueryKey')]);
 
         this._generateExistingItems(items);
         this._generateExitItems(items, rootItem);
@@ -284,9 +275,7 @@ class _d3 {
                     return HOVER_COLOR;
                 }
 
-                if (
-                    d.data[that._getConfig('childrenKey')].length === 0
-                ) {
+                if (d.data[that._getConfig('childrenKey')].length === 0) {
                     return LEAF_COLOR;
                 }
 
@@ -305,9 +294,7 @@ class _d3 {
                     return HOVER_COLOR;
                 }
 
-                if (
-                    d.data[that._getConfig('childrenKey')].length === 0
-                ) {
+                if (d.data[that._getConfig('childrenKey')].length === 0) {
                     return LEAF_COLOR;
                 }
 
@@ -322,9 +309,7 @@ class _d3 {
     _formatLabels(labels) {
         return labels
             .attr('font-weight', d => {
-                if (
-                    d.data[this._getConfig('childrenKey')].length === 0
-                ) {
+                if (d.data[this._getConfig('childrenKey')].length === 0) {
                     return 600;
                 }
 
@@ -397,18 +382,31 @@ class _d3 {
 
         this._zoomToPosition(0, 0, 1);
 
-        if (this.selected !== null) {
-            this.setSelection(this.selected);
+        if (this.searchQuery !== null) {
+            this.setSelection(this.searchQuery);
         }
 
         this._updateD3();
     }
 
+    updateDimensions() {
+        const { width, height } = this.svg.node().getBoundingClientRect();
+
+        this.config.width = width > 0 ? width : DEFAULT_WIDTH;
+        this.config.height = height > 0 ? height : DEFAULT_HEIGHT;
+
+        this.resetZoom();
+    }
+
     setSelection(selected) {
-        const items = this._findSelectedPathItems(this.data, selected, []);
+        const items = this._findSelectedPathItems(
+            this.data,
+            String(selected),
+            []
+        );
 
         if (items) {
-            this.selected = selected;
+            this.searchQuery = String(selected);
             this._unselectNodes();
             this._expandItems(items);
             this._zoomToItem(items.slice(-1)[0]);
@@ -416,7 +414,7 @@ class _d3 {
     }
 
     resetSelection() {
-        this.selected = null;
+        this.searchQuery = null;
 
         this._unselectNodes();
         this._updateD3();
@@ -425,7 +423,7 @@ class _d3 {
     }
 
     reload() {
-        this.selected = null;
+        this.searchQuery = null;
 
         this._unselectNodes();
 
@@ -440,9 +438,9 @@ class _d3 {
     }
 
     resetZoom() {
-        if (this.selected) {
+        if (this.searchQuery) {
             return this._zoomToItem(
-                this._findSelectedPathItems(this.data, this.selected, []).pop()
+                this._findSelectedPathItems(this.data, this.searchQuery, []).pop()
             );
         }
 
@@ -508,7 +506,11 @@ class _d3 {
     }
 
     _findSelectedPathItems(node, searchString, pathArray) {
-        if (node.data[this._getConfig('uniqueIdKey')] === searchString) {
+        if (
+            String(
+                node.data[this._getConfig('searchQueryKey')]
+            ).toLocaleLowerCase() === searchString.toLocaleLowerCase()
+        ) {
             pathArray.push(node);
 
             return pathArray;

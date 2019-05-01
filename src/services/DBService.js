@@ -27,27 +27,22 @@ class DBService {
                     children: [
                         {
                             children: [],
-                            id: '2',
                             name: 'Two',
                         },
                         {
                             children: [
                                 {
                                     children: [],
-                                    id: '4',
                                     name: 'Four',
                                 },
                                 {
                                     children: [],
-                                    id: '5',
                                     name: 'Five',
                                 }
                             ],
-                            id: '3',
                             name: 'Three',
                         }
                     ],
-                    id: '1',
                     name: 'One'
                 });
             }, 1000);

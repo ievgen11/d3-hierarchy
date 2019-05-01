@@ -1,8 +1,8 @@
 import { combineReducers } from "redux";
 import data from "./data";
-import selector from "./selector";
+import search from "./search";
 
 export default combineReducers({
     data,
-    selector
+    search
 });

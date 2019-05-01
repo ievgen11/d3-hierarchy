@@ -10,12 +10,12 @@ import HierarchyComponent from '../components/Hierarchy';
 class Hierarchy extends Component {
     static propTypes = {
         data: PropTypes.object,
-        selectedValue: PropTypes.string,
+        searchQuery: PropTypes.string,
         isError: PropTypes.bool.isRequired,
         isPending: PropTypes.bool.isRequired,
         getDataAction: PropTypes.func.isRequired,
-        setSelectedValue: PropTypes.func.isRequired,
-        resetSelectedValue: PropTypes.func.isRequired
+        setSearchQuery: PropTypes.func.isRequired,
+        resetSearchQuery: PropTypes.func.isRequired
     };
 
     componentDidMount() {
@@ -29,9 +29,9 @@ class Hierarchy extends Component {
             data,
             isPending,
             isError,
-            selectedValue,
-            resetSelectedValue,
-            setSelectedValue
+            searchQuery,
+            resetSearchQuery,
+            setSearchQuery
         } = this.props;
 
         return (
@@ -54,9 +54,9 @@ class Hierarchy extends Component {
                 }}
                 isPending={isPending}
                 isError={isError}
-                selectedValue={selectedValue}
-                onSearchSubmit={searchString => setSelectedValue(searchString)}
-                onSelectionClear={() => resetSelectedValue()}
+                searchQuery={searchQuery}
+                onSearchSubmit={searchString => setSearchQuery(searchString)}
+                onSelectionClear={() => resetSearchQuery()}
             />
         );
     }
@@ -64,16 +64,16 @@ class Hierarchy extends Component {
 
 const mapStateToProps = state => ({
     data: selectors.getData(state),
-    selectedValue: selectors.getSelectedValue(state),
+    searchQuery: selectors.getSearchQuery(state),
     isError: selectors.getDataIsError(state),
     isPending: selectors.getDataIsPending(state)
 });
 
 const mapDispatchToProps = dispatch => ({
     getDataAction: () => dispatch(actions.getData()),
-    setSelectedValue: searchString =>
-        dispatch(actions.setSelectedValue(searchString)),
-    resetSelectedValue: () => dispatch(actions.resetSelectedValue())
+    setSearchQuery: searchString =>
+        dispatch(actions.setSearchQuery(searchString)),
+    resetSearchQuery: () => dispatch(actions.resetSearchQuery())
 });
 
 export default withRouter(

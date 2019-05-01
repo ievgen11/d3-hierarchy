@@ -2,20 +2,20 @@ import * as actionTypes from "../actionTypes";
 import { Record } from "immutable";
 
 const Model = Record({
-    selectedValue: null
+    searchQuery: ''
 });
 
 const initialState = Model();
 
 const UserReducer = (state = initialState, action) => {
     switch (action.type) {
-        case actionTypes.SET_SELECTED_VALUE:
+        case actionTypes.SET_SEARCH_QUERY:
             return state.withMutations(mutant => {
-                mutant.set("selectedValue", action.payload);
+                mutant.set("searchQuery", action.payload);
             });
-        case actionTypes.RESET_SELECTED_VALUE:
+        case actionTypes.RESET_SEARCH_QUERY:
             return state.withMutations(mutant => {
-                mutant.set("selectedValue", null);
+                mutant.set("searchQuery", null);
             });
         default:
             return state;

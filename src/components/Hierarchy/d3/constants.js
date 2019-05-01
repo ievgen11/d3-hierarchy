@@ -8,7 +8,7 @@ export const DEFAULT_NODE_DISTANCE = 200;
 export const DEFAULT_SCALE_STEP = 0.25;
 export const DEFAULT_SCALE_EXTENT = [0.5, 2];
 export const DEFAULT_CHILDREN_KEY = 'children';
-export const DEFAULT_UNIQUE_ID_KEY = 'id';
+export const DEFAULT_SEARCH_QUERY_KEY = 'name';
 export const DEFAULT_ON_NODE_CLICK = () => null;
 export const DEFAULT_FORMAT_LABEL_TEXT = node => node.data.name;
 export const DEFAULT_ON_SELECTION_CLEAR = () => null;

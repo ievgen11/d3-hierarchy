@@ -7,19 +7,19 @@ export const getData = () => dispatch =>
         payload: DBService.generateData()
     });
 
-export const setSelectedValue = value => dispatch =>
+export const setSearchQuery = value => dispatch =>
     dispatch({
-        type: actionTypes.SET_SELECTED_VALUE,
-        payload: value
+        type: actionTypes.SET_SEARCH_QUERY,
+        payload: String(value)
     });
 
-export const resetSelectedValue = () => dispatch =>
+export const resetSearchQuery = () => dispatch =>
     dispatch({
-        type: actionTypes.RESET_SELECTED_VALUE
+        type: actionTypes.RESET_SEARCH_QUERY
     });
 
 export default {
     getData,
-    setSelectedValue,
-    resetSelectedValue
+    setSearchQuery,
+    resetSearchQuery
 };

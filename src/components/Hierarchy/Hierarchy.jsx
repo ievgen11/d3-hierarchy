@@ -20,7 +20,7 @@ class Hierarchy extends Component {
         isPending: PropTypes.bool,
         minWidth: PropTypes.any,
         minHeight: PropTypes.any,
-        selectedValue: PropTypes.string,
+        searchQuery: PropTypes.string,
         onSelectionClear: PropTypes.func,
         onSearchSubmit: PropTypes.func,
         onItemClick: PropTypes.func.isRequired,
@@ -31,7 +31,7 @@ class Hierarchy extends Component {
         isPending: false,
         minWidth: 'auto',
         minHeight: 'auto',
-        selectedValue: null
+        searchQuery: null
     };
 
     constructor(props) {
@@ -52,14 +52,14 @@ class Hierarchy extends Component {
 
     componentDidMount() {
         const {
-            selectedValue,
+            searchQuery,
             onItemClick,
             formatLabelText
         } = this.props;
 
         this._d3 = new _d3({
             root: this._root,
-            selectedValue: selectedValue,
+            searchQuery: searchQuery,
             onItemClick: onItemClick,
             onSelectionClear: this.handleSelectionClear,
             formatLabelText: formatLabelText
@@ -74,7 +74,7 @@ class Hierarchy extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        const { data, selectedValue } = this.props;
+        const { data, searchQuery } = this.props;
 
         if (!Map.isMap(data)) {
             return;
@@ -88,11 +88,11 @@ class Hierarchy extends Component {
             this._d3.updateData(data.toJS());
         }
 
-        if (selectedValue !== prevProps.selectedValue) {
-            if (selectedValue === null) {
+        if (searchQuery !== prevProps.searchQuery) {
+            if (searchQuery === null) {
                 this._d3.resetSelection();
             } else {
-                this._d3.setSelection(selectedValue);
+                this._d3.setSelection(searchQuery);
             }
         }
     }
@@ -132,7 +132,7 @@ class Hierarchy extends Component {
     }
 
     render() {
-        const { minWidth, minHeight, isPending, selectedValue } = this.props;
+        const { minWidth, minHeight, isPending, searchQuery } = this.props;
         const { isFullscreen, searchString } = this.state;
 
         return (
@@ -162,10 +162,10 @@ class Hierarchy extends Component {
                             primary: 'rgba(0, 0, 0, 0.54)'
                         }}
                     >
-                        {selectedValue ? (
+                        {searchQuery ? (
                             <TextField
                                 className="searchBar"
-                                value={selectedValue}
+                                value={searchQuery}
                                 readOnly
                                 trailingIcon={{
                                     icon: 'close',
