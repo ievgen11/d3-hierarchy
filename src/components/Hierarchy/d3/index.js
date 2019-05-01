@@ -84,6 +84,8 @@ class _d3 {
 
         this.config.width = width > 0 ? width : DEFAULT_WIDTH;
         this.config.height = height > 0 ? height : DEFAULT_HEIGHT;
+
+        this.resetZoom();
     }
 
     _handleOnItemClick(item) {

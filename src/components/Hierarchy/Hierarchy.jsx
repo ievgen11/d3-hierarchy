@@ -69,6 +69,10 @@ class Hierarchy extends Component {
         window.addEventListener('resize', this.handleResize);
     }
 
+    componentWillUnmount() {
+        window.removeEventListener("mousemove");
+    }
+
     componentDidUpdate(prevProps) {
         const { data, selectedValue } = this.props;
 
