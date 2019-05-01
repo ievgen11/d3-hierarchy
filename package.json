@@ -21,9 +21,11 @@
         "d3-transform": "^1.0.5",
         "d3-transition": "^1.2.0",
         "d3-zoom": "^1.7.3",
+        "express": "^4.16.4",
         "faker": "^4.1.0",
         "immutable": "^3.8.2",
         "normalize.css": "^8.0.1",
+        "path": "^0.12.7",
         "react": "^16.1.1",
         "react-dom": "^16.1.1",
         "react-json-tree": "^0.11.2",
@@ -39,6 +41,7 @@
     "scripts": {
         "build": "NODE_ENV=production react-scripts build",
         "watch": "NODE_ENV=development PORT=8080 react-scripts start",
+        "start": "node ./server.js",
         "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run build"
     },
     "proxy": "http://localhost:3000",
