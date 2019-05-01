@@ -67,7 +67,7 @@ class DataInspector extends Component {
                     </DialogActions>
                 </Dialog>
                 <Button onClick={() => this.setState(() => ({ isOpen: true }))}>
-                    Inspect
+                    Inspect Data
                 </Button>
             </>
         );

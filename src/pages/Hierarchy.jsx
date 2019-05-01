@@ -32,10 +32,10 @@ export default class extends Component {
                         <Hierarchy />
                     </section>
                     <section className="section">
-                        <DataGenerator /> <DataInspector />
+                        <ExpandedToggle />
                     </section>
                     <section className="section">
-                        <ExpandedToggle />
+                        <DataGenerator /> <DataInspector />
                     </section>
                 </div>
             </ThemeProvider>
