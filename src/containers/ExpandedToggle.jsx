@@ -27,7 +27,11 @@ class ExpandedToggle extends Component {
                     checked={isExpanded}
                     onChange={() => toggleDataIsExpandedAction()}
                     label={
-                        <Typography style={{ marginLeft: '12px' }} use="subtitle1" tag="span">
+                        <Typography
+                            style={{ marginLeft: '12px' }}
+                            use="subtitle1"
+                            tag="span"
+                        >
                             Expand tree when loaded
                         </Typography>
                     }

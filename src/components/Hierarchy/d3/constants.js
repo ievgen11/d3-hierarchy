@@ -1,4 +1,3 @@
-
 // CONFIG
 export const DEFAULT_SVG_CLASS = 'd3-hierarchy';
 export const DEFAULT_WIDTH = 200;

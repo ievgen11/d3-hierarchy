@@ -1,9 +1,9 @@
-const SEP = "/";
+const SEP = '/';
 
-export const createActionType = (context = [], actionType = "", sep = SEP) =>
+export const createActionType = (context = [], actionType = '', sep = SEP) =>
     [...context.map(d => d), actionType.toUpperCase()].join(sep);
 
-export const createPromiseTypes = (context = [], actionType = "", sep) => {
+export const createPromiseTypes = (context = [], actionType = '', sep) => {
     const type = createActionType(context, actionType, sep);
 
     return {

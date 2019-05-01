@@ -1,4 +1,4 @@
-import * as actionTypes from "./actionTypes";
+import * as actionTypes from './actionTypes';
 import DBService from '../services/DBService';
 
 export const getData = () => dispatch =>

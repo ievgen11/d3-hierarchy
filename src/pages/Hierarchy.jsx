@@ -23,7 +23,8 @@ export default class extends Component {
                             D3 Hierarchy
                         </Typography>
                         <Typography use="body1" tag="p">
-                            An example of how <b>Redux + Immutable + Material + D3.js </b>
+                            An example of how{' '}
+                            <b>Redux + Immutable + Material + D3.js </b>
                             can work together to create a clean and robust
                             application
                         </Typography>
