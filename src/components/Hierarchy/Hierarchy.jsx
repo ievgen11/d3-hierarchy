@@ -24,14 +24,16 @@ class Hierarchy extends Component {
         onSelectionClear: PropTypes.func,
         onSearchSubmit: PropTypes.func,
         onItemClick: PropTypes.func.isRequired,
-        formatLabelText: PropTypes.func
+        formatLabelText: PropTypes.func,
+        isExpanded: PropTypes.bool
     };
 
     static defaultProps = {
         isPending: false,
         minWidth: 'auto',
         minHeight: 'auto',
-        searchQuery: null
+        searchQuery: null,
+        isExpanded: false
     };
 
     constructor(props) {
@@ -51,11 +53,7 @@ class Hierarchy extends Component {
     }
 
     componentDidMount() {
-        const {
-            searchQuery,
-            onItemClick,
-            formatLabelText
-        } = this.props;
+        const { searchQuery, onItemClick, formatLabelText } = this.props;
 
         this._d3 = new _d3({
             root: this._root,
@@ -70,18 +68,18 @@ class Hierarchy extends Component {
     }
 
     componentWillUnmount() {
-        window.removeEventListener("mousemove");
+        window.removeEventListener('mousemove');
     }
 
     componentDidUpdate(prevProps) {
-        const { data, searchQuery } = this.props;
+        const { data, searchQuery, isExpanded } = this.props;
 
         if (!Map.isMap(data)) {
             return;
         }
 
         if (!data.equals(prevProps.data)) {
-            this._d3.updateData(data.toJS());
+            this._d3.updateData(data.toJS(), isExpanded);
         }
 
         if (searchQuery !== prevProps.searchQuery) {

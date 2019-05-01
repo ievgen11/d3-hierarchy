@@ -7,6 +7,11 @@ export const getData = () => dispatch =>
         payload: DBService.generateData()
     });
 
+export const toggleDataIsExpanded = () => dispatch =>
+    dispatch({
+        type: actionTypes.TOGGLE_DATA_IS_EXPANDED
+    });
+
 export const setSearchQuery = value => dispatch =>
     dispatch({
         type: actionTypes.SET_SEARCH_QUERY,
@@ -21,5 +26,6 @@ export const resetSearchQuery = () => dispatch =>
 export default {
     getData,
     setSearchQuery,
-    resetSearchQuery
+    resetSearchQuery,
+    toggleDataIsExpanded
 };

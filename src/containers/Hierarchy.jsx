@@ -15,7 +15,8 @@ class Hierarchy extends Component {
         isPending: PropTypes.bool.isRequired,
         getDataAction: PropTypes.func.isRequired,
         setSearchQuery: PropTypes.func.isRequired,
-        resetSearchQuery: PropTypes.func.isRequired
+        resetSearchQuery: PropTypes.func.isRequired,
+        isExpanded: PropTypes.bool.isRequired
     };
 
     componentDidMount() {
@@ -31,14 +32,15 @@ class Hierarchy extends Component {
             isError,
             searchQuery,
             resetSearchQuery,
-            setSearchQuery
+            setSearchQuery,
+            isExpanded
         } = this.props;
 
         return (
             <HierarchyComponent
                 data={data}
                 minWidth={800}
-                minHeight={600}
+                minHeight={500}
                 onItemClick={node => {
                     if (node.data.children.length !== 0) {
                         return;
@@ -52,6 +54,7 @@ class Hierarchy extends Component {
                         .focus();
                     return;
                 }}
+                isExpanded={isExpanded}
                 isPending={isPending}
                 isError={isError}
                 searchQuery={searchQuery}
@@ -65,6 +68,7 @@ class Hierarchy extends Component {
 const mapStateToProps = state => ({
     data: selectors.getData(state),
     searchQuery: selectors.getSearchQuery(state),
+    isExpanded: selectors.getDataIsExpanded(state),
     isError: selectors.getDataIsError(state),
     isPending: selectors.getDataIsPending(state)
 });

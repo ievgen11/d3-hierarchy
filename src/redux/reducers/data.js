@@ -8,7 +8,8 @@ const initialData = Map({
 const Model = Record({
     data: initialData,
     isPending: false,
-    isError: false
+    isError: false,
+    isExpanded: true
 });
 
 const initialState = Model();
@@ -32,6 +33,10 @@ const UserReducer = (state = initialState, action) => {
                 mutant.set("isError", true);
                 mutant.set("isPending", false);
                 mutant.set("data", initialData);
+            });
+        case actionTypes.TOGGLE_DATA_IS_EXPANDED:
+            return state.withMutations(mutant => {
+                mutant.set("isExpanded", !mutant.get('isExpanded'));
             });
         default:
             return state;

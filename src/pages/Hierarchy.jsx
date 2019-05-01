@@ -5,6 +5,7 @@ import { Typography } from '@rmwc/typography';
 import Hierarchy from '../containers/Hierarchy';
 import DataGenerator from '../containers/DataGenerator';
 import DataInspector from '../containers/DataInspector';
+import ExpandedToggle from '../containers/ExpandedToggle';
 
 export default class extends Component {
     render() {
@@ -32,6 +33,9 @@ export default class extends Component {
                     </section>
                     <section className="section">
                         <DataGenerator /> <DataInspector />
+                    </section>
+                    <section className="section">
+                        <ExpandedToggle />
                     </section>
                 </div>
             </ThemeProvider>

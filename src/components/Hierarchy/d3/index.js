@@ -387,10 +387,12 @@ class _d3 {
         return true;
     }
 
-    updateData(data) {
+    updateData(data, expandTree = false) {
         this.data = hierarchy(data, this._getConfig('childrenKeySelector'));
 
-        this._collapseDescendants(this.data);
+        if (!expandTree) {
+            this._collapseDescendants(this.data);
+        }
 
         this._zoomToPosition(0, 0, 1);
 
