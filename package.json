@@ -44,7 +44,6 @@
         "start": "node ./server.js",
         "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install && npm run build"
     },
-    "proxy": "http://localhost:3000",
     "browserslist": [
         ">0.2%",
         "not dead",

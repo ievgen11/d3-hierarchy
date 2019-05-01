@@ -1,10 +1,6 @@
 /node_modules
 /build
 
-# config
-/src/config/config_dev.js
-/src/config/config_prod.js
-
 # idea
 .idea
 
