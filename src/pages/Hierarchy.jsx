@@ -26,7 +26,7 @@ export default class extends Component {
                             An example of how{' '}
                             <b>Redux + Immutable + Material + D3.js </b>
                             can work together to create a clean and robust
-                            application
+                            application to display hierarchy data.
                         </Typography>
                     </section>
                     <section className="section">

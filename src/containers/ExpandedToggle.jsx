@@ -32,7 +32,7 @@ class ExpandedToggle extends Component {
                             use="subtitle1"
                             tag="span"
                         >
-                            Expand tree when loaded
+                            Expand when loaded
                         </Typography>
                     }
                 />

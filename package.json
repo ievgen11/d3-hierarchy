@@ -1,7 +1,7 @@
 {
     "name": "d3-hierarchy",
-    "version": "0.0.1",
-    "description": "React + Redux + Immutable + D3.js",
+    "version": "1.0.0",
+    "description": "Redux + Immutable + Material + D3.js",
     "author": "ievgen11",
     "dependencies": {
         "@rmwc/button": "^5.4.2",
