@@ -16,7 +16,7 @@
     z-index: 2;
 }
 
-svg {
+.d3-hierarchy {
     -moz-user-select: none;
     -ms-user-select: none;
     -khtml-user-select: none;
@@ -27,6 +27,16 @@ svg {
     position: absolute;
     top: 0;
     left: 0;
+    cursor: move; /* fallback if grab cursor is unsupported */
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+}
+
+.d3-hierarchy:active {
+    cursor: grabbing;
+    cursor: -moz-grabbing;
+    cursor: -webkit-grabbing;
 }
 
 .loaderContainer {
