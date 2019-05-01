@@ -5,7 +5,7 @@ import { Button } from '@rmwc/button';
 
 import actions from '../redux/actions';
 
-class UpdateButton extends Component {
+class DataGenerator extends Component {
     static propTypes = {
         getDataAction: PropTypes.func.isRequired
     };
@@ -15,7 +15,7 @@ class UpdateButton extends Component {
 
         return (
             <Button raised onClick={() => getDataAction()}>
-                Generate Data
+                Generate
             </Button>
         );
     }
@@ -28,4 +28,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
     null,
     mapDispatchToProps
-)(UpdateButton);
+)(DataGenerator);

@@ -80,10 +80,6 @@ class Hierarchy extends Component {
             return;
         }
 
-        if (data.get('children').size <= 0) {
-            return;
-        }
-
         if (!data.equals(prevProps.data)) {
             this._d3.updateData(data.toJS());
         }

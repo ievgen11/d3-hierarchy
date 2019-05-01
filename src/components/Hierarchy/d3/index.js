@@ -275,7 +275,7 @@ class _d3 {
                     return HOVER_COLOR;
                 }
 
-                if (d.data[that._getConfig('childrenKey')].length === 0) {
+                if (!that._itemHasChildren(d)) {
                     return LEAF_COLOR;
                 }
 
@@ -294,7 +294,7 @@ class _d3 {
                     return HOVER_COLOR;
                 }
 
-                if (d.data[that._getConfig('childrenKey')].length === 0) {
+                if (!that._itemHasChildren(d)) {
                     return LEAF_COLOR;
                 }
 
@@ -309,7 +309,7 @@ class _d3 {
     _formatLabels(labels) {
         return labels
             .attr('font-weight', d => {
-                if (d.data[this._getConfig('childrenKey')].length === 0) {
+                if (!this._itemHasChildren(d)) {
                     return 600;
                 }
 
@@ -358,7 +358,7 @@ class _d3 {
                 });
             })
             .attr('stroke-dasharray', d =>
-                d.data[this._getConfig('childrenKey')].length > 0
+                this._itemHasChildren(d)
                     ? null
                     : this._getConfig('leafDashArraySize')
             )
@@ -373,6 +373,18 @@ class _d3 {
             .attr('width', 50)
             .style('fill', 'none')
             .style('pointer-events', 'all');
+    }
+
+    _itemHasChildren(item) {
+        if (!Array.isArray(item.data[this._getConfig('childrenKey')])) {
+            return false;
+        }
+
+        if (item.data[this._getConfig('childrenKey')].length === 0) {
+            return false;
+        }
+
+        return true;
     }
 
     updateData(data) {
@@ -440,7 +452,11 @@ class _d3 {
     resetZoom() {
         if (this.searchQuery) {
             return this._zoomToItem(
-                this._findSelectedPathItems(this.data, this.searchQuery, []).pop()
+                this._findSelectedPathItems(
+                    this.data,
+                    this.searchQuery,
+                    []
+                ).pop()
             );
         }
 

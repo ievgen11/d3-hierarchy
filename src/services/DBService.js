@@ -1,50 +1,59 @@
-import * as firebase from 'firebase';
-
-import { FIREBASE_CONFIG } from '../config';
+import { commerce } from 'faker';
 
 let _dbService;
 
 class DBService {
-    constructor() {
-        firebase.initializeApp(FIREBASE_CONFIG);
-
-        this.db = firebase.firestore();
-    }
-
-    getData() {
-        return new Promise(resolve =>
-            this.db
-                .collection('geo-hierarchy')
-                .get()
-                .then(res => resolve(res.docs.map(doc => doc.data())))
-        );
-    }
-
     generateData() {
         return new Promise(resolve => {
             setTimeout(() => {
-                resolve({
-                    children: [
-                        {
-                            children: [],
-                            name: 'Two',
-                        },
-                        {
-                            children: [
-                                {
-                                    children: [],
-                                    name: 'Four',
-                                },
-                                {
-                                    children: [],
-                                    name: 'Five',
-                                }
-                            ],
-                            name: 'Three',
+                const ids = Array.from(Array(40).keys());
+
+                function getNestedChildren(arr, parent = 0) {
+                    const result = [];
+
+                    for (var i in arr) {
+                        if (arr[i].parent === parent) {
+                            result.push({
+                                id: arr[i].id,
+                                name: arr[i].name,
+                                children:
+                                    getNestedChildren(arr, arr[i].id) || []
+                            });
                         }
-                    ],
-                    name: 'One'
-                });
+                    }
+
+                    return result;
+                }
+
+                resolve(
+                    getNestedChildren(
+                        Array.from({ length: ids.length }, () => {
+                            const id = ids.pop();
+                            const name = commerce.productName();
+
+                            if (id === 0) {
+                                return {
+                                    id,
+                                    name: 'root'
+                                };
+                            }
+
+                            if (id === 1) {
+                                return {
+                                    id,
+                                    name,
+                                    parent: 0
+                                };
+                            }
+
+                            return {
+                                id,
+                                name,
+                                parent: Math.floor(Math.random() * 10) + 1
+                            };
+                        })
+                    )[0]
+                );
             }, 1000);
         });
     }

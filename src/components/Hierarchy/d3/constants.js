@@ -12,8 +12,6 @@ export const DEFAULT_SEARCH_QUERY_KEY = 'name';
 export const DEFAULT_ON_NODE_CLICK = () => null;
 export const DEFAULT_FORMAT_LABEL_TEXT = node => node.data.name;
 export const DEFAULT_ON_SELECTION_CLEAR = () => null;
-export const DEFAULT_REGION_LEVELS = [0, 1, 2, 3, 4, 5, 6];
-export const DEFAULT_MAX_REGION_LEVEL = 6;
 export const DEFAULT_LEAF_DASH_ARRAY_SIZE = '10,5';
 
 // COLORS

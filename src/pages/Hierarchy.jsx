@@ -3,8 +3,8 @@ import { ThemeProvider } from '@rmwc/theme';
 import { Typography } from '@rmwc/typography';
 
 import Hierarchy from '../containers/Hierarchy';
-import UpdateButton from '../containers/UpdateButton';
-import DataDump from '../containers/DataDump';
+import DataGenerator from '../containers/DataGenerator';
+import DataInspector from '../containers/DataInspector';
 
 export default class extends Component {
     render() {
@@ -31,7 +31,7 @@ export default class extends Component {
                         <Hierarchy />
                     </section>
                     <section className="section">
-                        <UpdateButton /> <DataDump />
+                        <DataGenerator /> <DataInspector />
                     </section>
                 </div>
             </ThemeProvider>
