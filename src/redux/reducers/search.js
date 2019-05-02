@@ -13,6 +13,7 @@ const UserReducer = (state = initialState, action) => {
             return state.withMutations(mutant => {
                 mutant.set('searchQuery', action.payload);
             });
+        case actionTypes.GET_DATA.PENDING:
         case actionTypes.RESET_SEARCH_QUERY:
             return state.withMutations(mutant => {
                 mutant.set('searchQuery', null);

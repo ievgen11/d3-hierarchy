@@ -634,6 +634,7 @@ class _d3 {
 
         this[_zoomToPosition](0, 0, 1);
         this[_updateD3]();
+        this[_getConfig]('onSelectionClear')();
     }
 
     resetZoom() {
