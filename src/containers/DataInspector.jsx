@@ -11,6 +11,13 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import selectors from '../redux/selectors';
 
+import {
+    SELECTED_COLOR,
+    HOVER_COLOR,
+    LEAF_COLOR,
+    NODE_COLOR
+} from '../constants/colors';
+
 class DataInspector extends Component {
     static propTypes = {
         data: PropTypes.object
@@ -50,14 +57,14 @@ class DataInspector extends Component {
                                     base05: '#e0e0e0',
                                     base06: '#f5f5f5',
                                     base07: '#ffffff',
-                                    base08: '#EF3D59',
-                                    base09: '#E17A47',
-                                    base0A: '#EFC958',
-                                    base0B: '#EF3D59',
-                                    base0C: '#4AB19D',
-                                    base0D: '#4AB19D',
-                                    base0E: '#EF3D59',
-                                    base0F: '#E17A47'
+                                    base08: LEAF_COLOR,
+                                    base09: NODE_COLOR,
+                                    base0A: SELECTED_COLOR,
+                                    base0B: LEAF_COLOR,
+                                    base0C: HOVER_COLOR,
+                                    base0D: HOVER_COLOR,
+                                    base0E: LEAF_COLOR,
+                                    base0F: NODE_COLOR
                                 }}
                             />
                         ) : null}

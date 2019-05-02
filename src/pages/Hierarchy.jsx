@@ -7,12 +7,14 @@ import DataGenerator from '../containers/DataGenerator';
 import DataInspector from '../containers/DataInspector';
 import ExpandedToggle from '../containers/ExpandedToggle';
 
+import { LEAF_COLOR } from '../constants/colors';
+
 export default class extends Component {
     render() {
         return (
             <ThemeProvider
                 options={{
-                    primary: '#EF3D59',
+                    primary: LEAF_COLOR,
                     secondary: 'rgba(255, 255, 255, 1)',
                     onSecondary: '#000'
                 }}

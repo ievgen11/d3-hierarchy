@@ -9,6 +9,8 @@ import { connect } from 'react-redux';
 import actions from '../redux/actions';
 import selectors from '../redux/selectors';
 
+import { SELECTED_COLOR } from '../constants/colors';
+
 class Selector extends Component {
     static propTypes = {
         data: PropTypes.object.isRequired,
@@ -49,7 +51,7 @@ class Selector extends Component {
                     {searchQuery ? (
                         <ThemeProvider
                             options={{
-                                primary: '#EFC958'
+                                primary: SELECTED_COLOR
                             }}
                         >
                             <Button

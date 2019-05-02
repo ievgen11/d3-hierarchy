@@ -377,7 +377,7 @@ class _d3 {
                     ? null
                     : this[_getConfig]('leafDashArraySize')
             )
-            .attr('stroke-width', 2);
+            .attr('stroke-width', 1.5);
     }
 
     [_formatOverlays](node) {

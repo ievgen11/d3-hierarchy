@@ -8,6 +8,8 @@ import { ThemeProvider } from '@rmwc/theme';
 import selectors from '../redux/selectors';
 import actions from '../redux/actions';
 
+import { LEAF_COLOR } from '../constants/colors';
+
 class ExpandedToggle extends Component {
     static propTypes = {
         toggleDataIsExpandedAction: PropTypes.func.isRequired,
@@ -20,7 +22,7 @@ class ExpandedToggle extends Component {
         return (
             <ThemeProvider
                 options={{
-                    secondary: '#EF3D59'
+                    secondary: LEAF_COLOR
                 }}
             >
                 <Switch

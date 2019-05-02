@@ -13,13 +13,14 @@ export const DEFAULT_FORMAT_LABEL_TEXT = node => node.data.name;
 export const DEFAULT_ON_SELECTION_CLEAR = () => null;
 export const DEFAULT_LEAF_DASH_ARRAY_SIZE = '10,5';
 
-// COLORS
-export const ROOT_COLOR = '#EFC958';
-export const NODE_COLOR = '#E17A47';
-export const LEAF_COLOR = '#EF3D59';
-export const LINK_COLOR = '#e6e6ea';
-export const SELECTED_COLOR = '#EFC958';
-export const HOVER_COLOR = '#4AB19D';
-
 // MISC
 export const TRANSITION_DURATION = 250;
+
+export {
+    ROOT_COLOR,
+    NODE_COLOR,
+    LEAF_COLOR,
+    LINK_COLOR,
+    SELECTED_COLOR,
+    HOVER_COLOR
+} from '../../../constants/colors';
