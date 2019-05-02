@@ -25,6 +25,9 @@ import '@material/button/dist/mdc.button.css';
 import '@material/dialog/dist/mdc.dialog.css';
 import '@material/switch/dist/mdc.switch.css';
 import '@material/form-field/dist/mdc.form-field.css';
+import '@material/menu/dist/mdc.menu.css';
+import '@material/menu-surface/dist/mdc.menu-surface.css';
+import '@material/list/dist/mdc.list.css';
 
 import './styles/app.css';
 

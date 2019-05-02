@@ -893,6 +893,45 @@
     "@material/theme" "^1.1.0"
     tslib "^1.9.3"
 
+"@material/list@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@material/list/-/list-1.1.1.tgz#296ed85ae3585af1749462e5bafd617d5675e85e"
+  dependencies:
+    "@material/base" "^1.0.0"
+    "@material/dom" "^1.1.0"
+    "@material/feature-targeting" "^0.44.1"
+    "@material/ripple" "^1.1.0"
+    "@material/rtl" "^0.42.0"
+    "@material/shape" "^1.1.1"
+    "@material/theme" "^1.1.0"
+    "@material/typography" "^1.0.0"
+    tslib "^1.9.3"
+
+"@material/menu-surface@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@material/menu-surface/-/menu-surface-1.1.1.tgz#d930f940e31a1bc32a2c9e3f15d5e60d43871cde"
+  dependencies:
+    "@material/animation" "^1.0.0"
+    "@material/base" "^1.0.0"
+    "@material/elevation" "^1.1.0"
+    "@material/feature-targeting" "^0.44.1"
+    "@material/rtl" "^0.42.0"
+    "@material/shape" "^1.1.1"
+    "@material/theme" "^1.1.0"
+    tslib "^1.9.3"
+
+"@material/menu@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@material/menu/-/menu-1.1.1.tgz#1a9ca4d0e88e6a2ead9793c0377e0ceb73802241"
+  dependencies:
+    "@material/base" "^1.0.0"
+    "@material/feature-targeting" "^0.44.1"
+    "@material/list" "^1.1.1"
+    "@material/menu-surface" "^1.1.1"
+    "@material/ripple" "^1.1.0"
+    "@material/rtl" "^0.42.0"
+    tslib "^1.9.3"
+
 "@material/notched-outline@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@material/notched-outline/-/notched-outline-1.1.1.tgz#a79c8aa3c5662b676bb46741658f434afa38f0da"
@@ -1094,6 +1133,14 @@
     "@rmwc/provider" "^5.4.2"
     "@rmwc/types" "^5.4.2"
 
+"@rmwc/icon@^5.4.3":
+  version "5.4.3"
+  resolved "https://registry.yarnpkg.com/@rmwc/icon/-/icon-5.4.3.tgz#70aff63f5579d765ba7b0574fda9e9f243ab8d6f"
+  dependencies:
+    "@rmwc/base" "^5.4.3"
+    "@rmwc/provider" "^5.4.3"
+    "@rmwc/types" "^5.4.3"
+
 "@rmwc/line-ripple@^5.4.2":
   version "5.4.2"
   resolved "https://registry.yarnpkg.com/@rmwc/line-ripple/-/line-ripple-5.4.2.tgz#a3818c9ec6129bb23b6f1bd837a99239cac4241c"
@@ -1101,6 +1148,27 @@
     "@material/line-ripple" "^1.1.0"
     "@rmwc/base" "^5.4.2"
     "@rmwc/types" "^5.4.2"
+
+"@rmwc/list@^5.4.3":
+  version "5.4.3"
+  resolved "https://registry.yarnpkg.com/@rmwc/list/-/list-5.4.3.tgz#7df68977c20c83ba2bc997412dd52e224c9f9b9f"
+  dependencies:
+    "@material/list" "^1.1.1"
+    "@rmwc/base" "^5.4.3"
+    "@rmwc/icon" "^5.4.3"
+    "@rmwc/provider" "^5.4.3"
+    "@rmwc/ripple" "^5.4.3"
+    "@rmwc/types" "^5.4.3"
+
+"@rmwc/menu@^5.4.3":
+  version "5.4.3"
+  resolved "https://registry.yarnpkg.com/@rmwc/menu/-/menu-5.4.3.tgz#7bb263f0da406fe3ea490bb69941f637a5ef636e"
+  dependencies:
+    "@material/menu" "^1.1.1"
+    "@material/menu-surface" "^1.1.1"
+    "@rmwc/base" "^5.4.3"
+    "@rmwc/list" "^5.4.3"
+    "@rmwc/types" "^5.4.3"
 
 "@rmwc/notched-outline@^5.4.2":
   version "5.4.2"

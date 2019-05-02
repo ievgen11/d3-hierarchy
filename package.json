@@ -9,6 +9,7 @@
         "@rmwc/dialog": "^5.4.2",
         "@rmwc/fab": "^5.3.1",
         "@rmwc/icon": "^5.3.1",
+        "@rmwc/menu": "^5.4.3",
         "@rmwc/provider": "^5.2.1",
         "@rmwc/switch": "^5.4.3",
         "@rmwc/textfield": "^5.4.2",
